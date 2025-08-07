@@ -1,275 +1,140 @@
-# Glasses Discomfort Survey with Database Support
+# OSDI Survey System
 
-This is a comprehensive web-based survey system with database support, designed to assess and track the discomfort experienced by glasses wearers in different environments and their eye health conditions.
+一个现代化的在线调查系统，支持多语言界面和实时数据收集。
 
-## 🆕 New Database Features
+## 🌟 功能特性
 
-- **Data Persistence**: All survey responses are saved to a SQLite database
-- **Admin Dashboard**: View statistics, recent submissions, and export data
-- **Real-time Analytics**: Track submission trends and rating distributions
-- **Data Export**: Export all data as JSON for analysis
-- **API Integration**: RESTful API for survey submissions and data retrieval
+- **多语言支持**: 中文和英文界面
+- **响应式设计**: 适配各种设备屏幕
+- **实时数据收集**: 支持实时数据同步和导出
+- **管理员界面**: 完整的数据管理和分析功能
+- **现代化UI**: 美观的渐变设计和用户体验
 
-## 🎨 Custom Logo Support
+## 🚀 快速开始
 
-- **Easy Logo Replacement**: Simply place your logo files in the `images/` directory
-- **Dual Logo Support**: Separate logos for main page and admin dashboard
-- **Responsive Design**: Logos automatically adapt to different screen sizes
-- **Professional Display**: Optimized for medical/healthcare branding
+### 本地开发
 
-### Logo Files Needed:
-- `images/koushicare-logo.png` - Main survey page logo
-- `images/koushicare-logo-white.png` - Admin dashboard logo (white/light version)
-
-📖 **Detailed instructions**: See `LOGO_REPLACEMENT_GUIDE.md`
-
-## Features
-
-- ✨ **Responsive Design** - Supports computers, tablets, and mobile devices
-- 🎨 **Unified Pink Theme** - Consistent visual style with the original survey forms
-- 📊 **Smart Results Analysis** - Provides detailed score statistics and health recommendations
-- 💾 **Local Data Storage** - Automatically saves responses, won't lose data on page refresh
-- 📄 **Results Export** - Supports exporting text files and printing functionality
-- ⚡ **Real-time Validation** - Ensures all questions are completed
-- 🎯 **User-friendly** - Smooth animations and visual feedback enhance user experience
-
-## Survey Content
-
-### 1. The degree of discomfort of the glasses in a particular environment
-- windy
-- dry
-- windy
-
-### 2. The degree of eye discomfort
-- photophobia
-- feeling of sand in the eyes
-- pain/swelling
-- blurred vision
-- decreased vision
-
-### 3. Daily eye habits
-- reading
-- driving at night
-- using computer
-- watching TV
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Node.js 14.0.0 or higher
-- npm (comes with Node.js)
-
-### Installation
-
-#### Option 1: Automated Installation (Recommended)
+1. **克隆仓库**
 ```bash
-# Make the install script executable and run it
-chmod +x install.sh
-./install.sh
+git clone https://github.com/liangrenjie873/osdi-survey-.git
+cd osdi-survey-
 ```
 
-#### Option 2: Manual Installation
+2. **安装依赖**
 ```bash
-# Install dependencies
 npm install
+```
 
-# Start the server
+3. **启动开发服务器**
+```bash
 npm start
 ```
 
-### Usage
-1. **Start the server**: 
-   ```bash
-   npm start
-   ```
-   For development with auto-restart:
-   ```bash
-   npm run dev
-   ```
+4. **访问应用**
+- 主页面: http://localhost:3000
+- 管理员界面: http://localhost:3000/admin.html
 
-2. **Access the survey**: Open `http://localhost:3000` in your browser
+### 部署到生产环境
 
-3. **Admin dashboard**: Visit `http://localhost:3000/admin` to view:
-   - Submission statistics
-   - Rating distributions
-   - Recent submissions
-   - Data export functionality
+#### 使用Netlify部署
 
-## 📊 Database Schema
+1. 将代码推送到GitHub
+2. 在Netlify中连接GitHub仓库
+3. 设置构建命令: `npm install && npm start`
+4. 设置发布目录: `.`
 
-The system uses SQLite with the following main tables:
+#### 使用Vercel部署
 
-### surveys
-Stores individual survey responses with calculated scores:
-- Personal responses (windy1, dry, windy2, photophobia, etc.)
-- Calculated category scores
-- Overall rating and percentage
-- Submission metadata (IP, timestamp, user agent)
+1. 安装Vercel CLI: `npm i -g vercel`
+2. 运行: `vercel`
+3. 按照提示完成部署
 
-### survey_summary
-Daily aggregated statistics for performance optimization
-
-## Scoring Instructions
-
-Each question uses a 5-point scale:
-- **always** (4 points) - Frequently occurs
-- **usually** (3 points) - Occurs most of the time
-- **half time** (2 points) - Occurs occasionally
-- **sometimes** (1 point) - Rarely occurs
-- **never** (0 points) - Never occurs
-
-## OSDI Scoring System
-
-The system uses the standard **OSDI (Ocular Surface Disease Index)** calculation:
-
-**OSDI Score = (Sum of scores × 25) ÷ Number of questions answered**
-
-This produces a score from 0 to 100, where:
-- **0-12**: Normal/No Significant Discomfort
-- **13-22**: Mild Discomfort  
-- **23-32**: Moderate Discomfort
-- **33-100**: Severe Discomfort
-
-## Results Interpretation
-
-The system calculates both raw scores and OSDI scores:
-
-### Raw Scores
-- Environment: 0-12 points (3 questions × 4 max points)
-- Eye Discomfort: 0-20 points (5 questions × 4 max points)  
-- Daily Habits: 0-16 points (4 questions × 4 max points)
-- **Total**: 0-52 points (13 questions × 4 max points)
-
-### OSDI Scores (0-100)
-- **Normal** (OSDI < 13) - Good eye health condition
-- **Mild Discomfort** (OSDI 13-22) - Monitor symptoms, basic eye care
-- **Moderate Discomfort** (OSDI 23-32) - Consider professional consultation
-- **Severe Discomfort** (OSDI ≥ 33) - Recommend immediate medical examination
-
-## 🔌 API Endpoints
-
-### POST /api/survey/submit
-Submit a new survey response
-```json
-{
-  "windy1": 2, "dry": 1, "windy2": 3,
-  "photophobia": 1, "sandFeeling": 0,
-  "painSwelling": 2, "blurredVision": 1,
-  "decreasedVision": 0, "reading": 4,
-  "nightDriving": 2, "computerUse": 3,
-  "watchingTV": 2
-}
-```
-
-### GET /api/survey/stats
-Get overall statistics and rating distribution
-
-### GET /api/survey/recent/:limit
-Get recent submissions (default: 10, max in example: 20)
-
-### GET /api/survey/export
-Export all survey data (admin only)
-
-## 🔒 Security Features
-
-- **Rate Limiting**: 100 requests per 15 minutes per IP
-- **CORS Protection**: Configured for web security
-- **Helmet Security Headers**: Additional HTTP security
-- **Input Validation**: Server-side validation of all inputs
-- **SQL Injection Protection**: Using parameterized queries
-
-## Technical Implementation
-
-- **Backend**: Node.js + Express.js
-- **Database**: SQLite3 for simplicity and portability
-- **Frontend**: HTML5, CSS3, Vanilla JavaScript
-- **Security**: Helmet, CORS, Rate Limiting
-- **Data Storage**: SQLite database + localStorage backup
-
-## Browser Compatibility
-
-- Chrome 60+
-- Firefox 55+
-- Safari 12+
-- Edge 79+
-- Mobile browsers
-
-## File Structure
+## 📁 项目结构
 
 ```
-├── index.html          # Main survey page
-├── admin.html          # Admin dashboard
-├── server.js           # Express.js backend server
-├── style.css           # CSS styles (shared)
-├── script.js           # Frontend JavaScript
-├── package.json        # Node.js dependencies
-├── install.sh          # Automated setup script
-├── README.md           # This documentation
-├── survey.db           # SQLite database (created on first run)
-└── data/               # Database backup directory
+OSDI/
+├── index.html          # 主页面
+├── admin.html          # 管理员界面
+├── remote-admin.html   # 远程管理界面
+├── script.js           # 主要JavaScript逻辑
+├── style.css           # 样式文件
+├── server.js           # 服务器端代码
+├── package.json        # 项目配置
+└── images/             # 图片资源
+    ├── koushicare-logo.png
+    └── koushicare-logo-white.png
 ```
 
-## 🚀 Deployment
+## 🛠️ 技术栈
 
-### Development
+- **前端**: HTML5, CSS3, JavaScript (ES6+)
+- **后端**: Node.js, Express.js
+- **数据库**: 文件系统存储 (可扩展为MongoDB/MySQL)
+- **部署**: Netlify, Vercel, Heroku
+
+## 📊 功能模块
+
+### 用户界面
+- 多语言切换 (中文/英文)
+- 响应式设计
+- 表单验证
+- 实时反馈
+
+### 管理员功能
+- 数据查看和导出
+- 实时统计
+- 用户管理
+- 系统设置
+
+## 🔧 配置说明
+
+### 环境变量
 ```bash
-npm run dev    # Uses nodemon for auto-restart
+PORT=3000                    # 服务器端口
+NODE_ENV=production          # 环境模式
 ```
 
-### Production
-```bash
-npm start      # Standard production start
-```
+### 数据库配置
+当前使用文件系统存储，支持扩展为其他数据库：
+- MongoDB
+- MySQL
+- PostgreSQL
 
-### Environment Variables (Optional)
-```bash
-PORT=3000      # Server port (default: 3000)
-NODE_ENV=production
-```
+## 📈 数据导出
 
-## 📈 Monitoring & Maintenance
+系统支持多种数据导出格式：
+- CSV格式
+- JSON格式
+- Excel格式
 
-### Database Management
-- SQLite database file: `survey.db`
-- Automatic daily summary updates
-- Built-in data export functionality
+## 🌐 国际化
 
-### Backup Recommendations
-1. Regular database backups: `cp survey.db backups/survey_$(date +%Y%m%d).db`
-2. Export data periodically via admin panel
-3. Monitor disk space for log files
+支持的语言：
+- 中文 (简体)
+- English (英文)
 
-## 🛠️ Troubleshooting
+## 🤝 贡献指南
 
-### Common Issues
+1. Fork 项目
+2. 创建功能分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 打开 Pull Request
 
-**Server won't start**
-- Check if Node.js is installed: `node --version`
-- Verify port 3000 is available: `netstat -tulpn | grep 3000`
-- Install dependencies: `npm install`
+## 📄 许可证
 
-**Database errors**
-- Check write permissions in project directory
-- Ensure SQLite3 is properly installed
-- Delete and recreate database: `rm survey.db` then restart server
+本项目采用 MIT 许可证 - 查看 [LICENSE](LICENSE) 文件了解详情
 
-**Network issues**
-- Check firewall settings
-- Verify CORS configuration in server.js
-- Test API endpoints manually: `curl http://localhost:3000/api/survey/stats`
+## 👨‍💻 作者
 
-## Notes
+**liangrenjie873**
 
-1. Database automatically handles schema creation
-2. Rate limiting prevents spam submissions
-3. All data includes IP tracking for analytics
-4. Admin dashboard updates in real-time
-5. System handles both online and offline scenarios
+- GitHub: [@liangrenjie873](https://github.com/liangrenjie873)
 
-## Privacy & Data Protection
+## 🙏 致谢
 
-- **Server-side Storage**: All responses stored in local SQLite database
-- **IP Tracking**: IP addresses logged for analytics and spam prevention
-- **No External Services**: All data remains on your server
-- **Data Retention**: No automatic data deletion (manual management required)
-- **Export Capability**: Full data export available for compliance
+感谢所有为这个项目做出贡献的开发者和用户！
+
+---
+
+⭐ 如果这个项目对您有帮助，请给我们一个星标！
