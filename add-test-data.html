@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>添加测试数据</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 添加测试数据</h1>
+        <p>数据库被重置了，让我们添加一些测试数据：</p>
+        
+        <div>
+            <button class="test-button" onclick="addTestData1()">添加测试数据1</button>
+            <button class="test-button" onclick="addTestData2()">添加测试数据2</button>
+            <button class="test-button" onclick="addTestData3()">添加测试数据3</button>
+            <button class="test-button" onclick="checkData()">检查数据</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            
+            resultsDiv.textContent += logEntry;
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function addTestData1() {
+            const testData = {
+                participantName: '张三',
+                windy1: 2,
+                dry: 3,
+                windy2: 1,
+                photophobia: 2,
+                sandFeeling: 1,
+                painSwelling: 0,
+                blurredVision: 2,
+                decreasedVision: 1,
+                reading: 3,
+                nightDriving: 2,
+                computerUse: 4,
+                watchingTV: 1
+            };
+            
+            await submitData(testData, '测试数据1');
+        }
+
+        async function addTestData2() {
+            const testData = {
+                participantName: '李四',
+                windy1: 1,
+                dry: 2,
+                windy2: 0,
+                photophobia: 1,
+                sandFeeling: 0,
+                painSwelling: 0,
+                blurredVision: 1,
+                decreasedVision: 0,
+                reading: 2,
+                nightDriving: 1,
+                computerUse: 3,
+                watchingTV: 0
+            };
+            
+            await submitData(testData, '测试数据2');
+        }
+
+        async function addTestData3() {
+            const testData = {
+                participantName: '王五',
+                windy1: 4,
+                dry: 4,
+                windy2: 3,
+                photophobia: 4,
+                sandFeeling: 3,
+                painSwelling: 2,
+                blurredVision: 4,
+                decreasedVision: 3,
+                reading: 4,
+                nightDriving: 4,
+                computerUse: 4,
+                watchingTV: 3
+            };
+            
+            await submitData(testData, '测试数据3');
+        }
+
+        async function submitData(data, name) {
+            try {
+                log(`开始提交${name}...`);
+                
+                const response = await fetch('/api/survey/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    log(`✅ ${name}提交成功: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    log(`❌ ${name}提交失败: ${JSON.stringify(result, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                log(`❌ ${name}提交错误: ${error.message}`, 'error');
+            }
+        }
+
+        async function checkData() {
+            try {
+                log('检查当前数据...');
+                
+                const response = await fetch('/api/survey/recent/10');
+                const data = await response.json();
+                
+                log(`当前数据条数: ${data.length}`);
+                log(`数据内容: ${JSON.stringify(data, null, 2)}`);
+                
+            } catch (error) {
+                log(`检查数据错误: ${error.message}`, 'error');
+            }
+        }
+
+        // 页面加载时检查数据
+        window.onload = function() {
+            log('页面加载完成，检查当前数据状态...');
+            checkData();
+        };
+    </script>
+</body>
+</html> 
