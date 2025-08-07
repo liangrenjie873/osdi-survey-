@@ -18,6 +18,41 @@
             
             <h1 onclick="handleAdminClick()" style="cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='#D01F3E'" onmouseout="this.style.color=''" title="Click to access admin panel">OSDI TEST</h1>
             <p>Please select the option that best describes the frequency of your recent discomfort.</p>
+            
+            <!-- 管理员入口按钮 -->
+            <div style="text-align: center; margin: 20px 0;">
+                <button onclick="handleAdminClick()" style="
+                    background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+                    color: white;
+                    border: none;
+                    padding: 10px 20px;
+                    border-radius: 25px;
+                    cursor: pointer;
+                    font-size: 14px;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 10px rgba(208, 31, 62, 0.2);
+                    margin-right: 10px;
+                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 20px rgba(208, 31, 62, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 10px rgba(208, 31, 62, 0.2)';" title="Click to access admin panel">
+                    🔧 Admin Panel
+                </button>
+                
+                <!-- 备用直接链接按钮 -->
+                <a href="admin.html" style="
+                    background: linear-gradient(135deg, #666 0%, #888 100%);
+                    color: white;
+                    text-decoration: none;
+                    padding: 10px 20px;
+                    border-radius: 25px;
+                    font-size: 14px;
+                    font-weight: 500;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                    display: inline-block;
+                " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 20px rgba(0, 0, 0, 0.4)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 10px rgba(0, 0, 0, 0.2)';" title="Direct access to admin panel (no password)">
+                    📊 Direct Access
+                </a>
+            </div>
         </header>
 
         <form id="surveyForm">
