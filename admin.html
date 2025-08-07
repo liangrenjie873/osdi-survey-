@@ -189,6 +189,27 @@
                 
                 console.log(`Loaded ${allData.length} records from localStorage`);
                 
+                // If no data found, show empty state
+                if (allData.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #666;">
+                            <h3>📊 No Survey Data Found</h3>
+                            <p>No survey submissions have been recorded yet.</p>
+                            <p>Data will appear here after users submit the OSDI survey.</p>
+                            <div style="margin-top: 20px;">
+                                <a href="index.html" style="
+                                    background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+                                    color: white;
+                                    text-decoration: none;
+                                    padding: 10px 20px;
+                                    border-radius: 8px;
+                                    font-weight: 500;
+                                ">Go to Survey</a>
+                            </div>
+                        </div>
+                    `;
+                }
+                
             } catch (error) {
                 console.error('Error loading data:', error);
                 container.innerHTML = '<div class="error">Error loading data: ' + error.message + '</div>';
