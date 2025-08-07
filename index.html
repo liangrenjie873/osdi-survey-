@@ -10,13 +10,13 @@
     <div class="container">
         <header>
             <!-- KOUSHICARE Logo -->
-            <div class="header-logo" onclick="var pwd=prompt('Enter admin password:'); if(pwd==='123456'){alert('Access granted!'); window.location.href='admin.html';}else if(pwd!==null){alert('Incorrect password!');}" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Click to access admin panel" style="cursor: pointer; transition: opacity 0.3s;">
+            <div class="header-logo" onclick="handleAdminClick()" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Click to access admin panel" style="cursor: pointer; transition: opacity 0.3s;">
                 <img src="images/koushicare-logo.png" alt="KOUSHICARE" class="main-logo">
                 <!-- Hidden admin link for backup -->
                 <a href="admin.html" id="adminLink" style="display: none;" target="_blank">Admin</a>
             </div>
             
-            <h1 onclick="var pwd=prompt('Enter admin password:'); if(pwd==='123456'){alert('Access granted!'); window.location.href='admin.html';}else if(pwd!==null){alert('Incorrect password!');}" style="cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='#D01F3E'" onmouseout="this.style.color=''" title="Click to access admin panel">OSDI TEST</h1>
+            <h1 onclick="handleAdminClick()" style="cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='#D01F3E'" onmouseout="this.style.color=''" title="Click to access admin panel">OSDI TEST</h1>
             <p>Please select the option that best describes the frequency of your recent discomfort.</p>
         </header>
 
@@ -381,34 +381,44 @@
     </div>
 
     <script src="script.js"></script>
-    <script>
-        // 管理员访问函数 - 简化版本
-        function adminAccess() {
-            console.log('Admin access function called');
-            
-            // Request password
-            var password = prompt('Enter admin password:');
-            
-            if (password === '123456') {
-                // Correct password, redirect to admin panel
-                console.log('Password correct, redirecting...');
-                alert('Access granted! Redirecting to admin panel...');
-                window.location.href = 'admin.html';
-            } else if (password !== null) {
-                // Wrong password (null means user cancelled)
-                alert('Incorrect password!');
+    <script type="text/javascript">
+        // 全局管理员访问函数 - 兼容版本
+        function handleAdminClick() {
+            try {
+                var password = prompt('Enter admin password:');
+                if (password === '123456') {
+                    alert('Access granted! Redirecting to admin panel...');
+                    setTimeout(function() {
+                        window.location.href = 'admin.html';
+                    }, 500);
+                } else if (password !== null && password !== '') {
+                    alert('Incorrect password!');
+                }
+            } catch (e) {
+                alert('Error: ' + e.message);
             }
         }
         
+        // 确保函数在全局作用域中
+        window.handleAdminClick = handleAdminClick;
+        
         // 备用函数
-        function openAdminPanel() {
-            adminAccess();
+        function adminAccess() {
+            handleAdminClick();
         }
         
-        // 页面加载时测试函数
-        window.onload = function() {
-            console.log('Page loaded, admin access function is ready');
-        };
+        function openAdminPanel() {
+            handleAdminClick();
+        }
+        
+        // 页面加载完成后的初始化
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                console.log('Page loaded, admin functions ready');
+            });
+        } else {
+            console.log('Page already loaded, admin functions ready');
+        }
     </script>
 </body>
 </html>
