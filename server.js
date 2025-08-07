@@ -29,11 +29,15 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Rate limiting
+// Rate limiting - more permissive for testing
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.'
+    max: 1000, // increased limit for testing
+    message: 'Too many requests from this IP, please try again later.',
+    skip: (req) => {
+        // Skip rate limiting for health checks and certain IPs
+        return req.path === '/api/health' || req.path === '/api/survey/recent';
+    }
 });
 app.use('/api/', limiter);
 
@@ -171,6 +175,15 @@ app.post('/api/survey/submit', (req, res) => {
     const data = req.body;
     const clientIP = req.ip || req.connection.remoteAddress;
     const userAgent = req.get('User-Agent');
+    
+    // Log detailed request information for debugging
+    console.log('=== Survey Submission Request ===');
+    console.log('Client IP:', clientIP);
+    console.log('User Agent:', userAgent);
+    console.log('Request Headers:', req.headers);
+    console.log('Request Body:', JSON.stringify(data, null, 2));
+    console.log('Timestamp:', new Date().toISOString());
+    console.log('================================');
     
     // Validate required fields
     const requiredFields = [
