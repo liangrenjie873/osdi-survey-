@@ -616,14 +616,24 @@ function scrollToElement(elementId) {
 
 // Logo click handler - open admin panel with password
 function openAdminPanel() {
-    // Request password
-    const password = prompt('Enter admin password:');
-    
-    if (password === '123456') {
-        // Correct password, redirect to unified admin panel
+    try {
+        // Request password
+        const password = prompt('Enter admin password:');
+        
+        if (password === '123456') {
+            // Correct password, redirect to unified admin panel
+            console.log('Password correct, redirecting to admin panel...');
+            
+            // Simple direct navigation
+            window.location.href = 'admin.html';
+            
+        } else if (password !== null) {
+            // Wrong password (null means user cancelled)
+            alert('Incorrect password!');
+        }
+    } catch (error) {
+        console.error('Error opening admin panel:', error);
+        // Fallback: try direct navigation
         window.location.href = 'admin.html';
-    } else if (password !== null) {
-        // Wrong password (null means user cancelled)
-        alert('Incorrect password!');
     }
 }
