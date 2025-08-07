@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Sync Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff2f6 50%, #ffe8ed 75%, #ffeef2 100%);
+        }
+        .demo-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid rgba(208, 31, 62, 0.1);
+        }
+        .demo-card h3 {
+            color: #D01F3E;
+            margin-bottom: 15px;
+        }
+        button {
+            background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 1em;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #b71c3b 0%, #d42850 100%);
+        }
+        .code {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Data Sync Demo & Test</h1>
+    <p>This page demonstrates how the international data sync will work.</p>
+
+    <div class="demo-card">
+        <h3>1. 📋 Create Sample International Data</h3>
+        <p>First, let's create some sample data that would come from your international website:</p>
+        <button onclick="createSampleData()">Create Sample International Data</button>
+        <div id="sampleResult"></div>
+    </div>
+
+    <div class="demo-card">
+        <h3>2. 🔄 Test Data Sync</h3>
+        <p>Now test the sync function that will be used in the real remote admin panel:</p>
+        <button onclick="testDataSync()">Test Data Sync Function</button>
+        <div id="syncResult"></div>
+    </div>
+
+    <div class="demo-card">
+        <h3>3. 🌍 Access Remote Admin Panel</h3>
+        <p>Open the actual remote admin panel to see how it works:</p>
+        <button onclick="openRemoteAdmin()">Open Remote Admin Panel</button>
+        <p><small>Password: 123456, then choose "Cancel" for global management</small></p>
+    </div>
+
+    <div class="demo-card">
+        <h3>4. 📊 View Combined Data</h3>
+        <p>See how local and remote data are displayed together:</p>
+        <div id="combinedDataPreview"></div>
+        <button onclick="showCombinedPreview()">Show Data Preview</button>
+    </div>
+
+    <div class="demo-card">
+        <h3>5. 🚀 Deployment URLs</h3>
+        <p>When you deploy internationally, your URLs will be:</p>
+        <div class="code">
+Survey Website: https://survey.your-domain.com
+Data Export API: https://survey.your-domain.com/api/survey/export
+Admin Panel: https://survey.your-domain.com (click logo)
+        </div>
+        <p>You would configure the remote admin panel with your international URL.</p>
+    </div>
+
+    <script>
+        // Sample international data that would come from your overseas website
+        const sampleInternationalData = {
+            export_time: new Date().toISOString(),
+            version: "1.0",
+            source: "OSDI Survey System - International Site",
+            total_records: 5,
+            submissions: [
+                {
+                    id: 101,
+                    participant_name: "John Smith",
+                    submission_time: "2024-01-15T14:30:00.000Z",
+                    overall_osdi: 28.5,
+                    overall_rating: "Moderate Dry Eye"
+                },
+                {
+                    id: 102,
+                    participant_name: "Mary Johnson",
+                    submission_time: "2024-01-15T16:45:00.000Z",
+                    overall_osdi: 15.2,
+                    overall_rating: "Mild Dry Eye"
+                },
+                {
+                    id: 103,
+                    participant_name: "David Wilson",
+                    submission_time: "2024-01-16T09:15:00.000Z",
+                    overall_osdi: 42.1,
+                    overall_rating: "Severe Dry Eye"
+                },
+                {
+                    id: 104,
+                    participant_name: "Lisa Chen",
+                    submission_time: "2024-01-16T11:30:00.000Z",
+                    overall_osdi: 8.7,
+                    overall_rating: "Normal"
+                },
+                {
+                    id: 105,
+                    participant_name: "Robert Brown",
+                    submission_time: "2024-01-16T15:20:00.000Z",
+                    overall_osdi: 33.6,
+                    overall_rating: "Severe Dry Eye"
+                }
+            ]
+        };
+
+        function createSampleData() {
+            // Store sample data in localStorage for demo
+            localStorage.setItem('demo_international_data', JSON.stringify(sampleInternationalData));
+            
+            document.getElementById('sampleResult').innerHTML = `
+                <div class="success">
+                    ✅ Created ${sampleInternationalData.submissions.length} sample international survey records
+                    <div class="code">
+${JSON.stringify(sampleInternationalData, null, 2)}
+                    </div>
+                </div>
+            `;
+        }
+
+        function testDataSync() {
+            try {
+                // Simulate the sync process that happens in remote-admin.html
+                const remoteData = JSON.parse(localStorage.getItem('demo_international_data'));
+                
+                if (!remoteData) {
+                    throw new Error('No sample data found. Please create sample data first.');
+                }
+
+                // Process the data (same as in remote-admin.html)
+                const processedData = remoteData.submissions.map(item => ({
+                    participant_name: item.participant_name,
+                    submission_time: item.submission_time,
+                    overall_osdi: item.overall_osdi,
+                    source: 'remote'
+                }));
+
+                // Show sync result
+                document.getElementById('syncResult').innerHTML = `
+                    <div class="success">
+                        🔄 Sync simulation completed successfully!
+                        <br>📊 Synced ${processedData.length} records from international site
+                        <br>🌍 Source: ${remoteData.source}
+                        <br>⏰ Export time: ${new Date(remoteData.export_time).toLocaleString()}
+                    </div>
+                    <div class="code">
+                        // This is what the sync function would receive:
+                        ${processedData.map(item => 
+                            `${item.participant_name}: ${item.overall_osdi} (${item.source})`
+                        ).join('\n')}
+                    </div>
+                `;
+            } catch (error) {
+                document.getElementById('syncResult').innerHTML = `
+                    <div class="error">
+                        ❌ Sync failed: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        function openRemoteAdmin() {
+            // Open the remote admin panel in a new tab
+            window.open('remote-admin.html', '_blank');
+        }
+
+        function showCombinedPreview() {
+            // Load both local and remote data
+            const localData = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('survey_')) {
+                    try {
+                        const item = JSON.parse(localStorage.getItem(key));
+                        if (item && item.timestamp) {
+                            localData.push({
+                                participant_name: item.participantName || 'Anonymous',
+                                submission_time: item.timestamp,
+                                overall_osdi: item.overallOSDI || 0,
+                                source: 'local'
+                            });
+                        }
+                    } catch (e) {
+                        console.warn('Error parsing localStorage item:', key);
+                    }
+                }
+            }
+
+            const remoteData = JSON.parse(localStorage.getItem('demo_international_data') || '{"submissions": []}');
+            const processedRemoteData = remoteData.submissions ? remoteData.submissions.map(item => ({
+                participant_name: item.participant_name,
+                submission_time: item.submission_time,
+                overall_osdi: item.overall_osdi,
+                source: 'remote'
+            })) : [];
+
+            const combinedData = [...localData, ...processedRemoteData]
+                .sort((a, b) => new Date(b.submission_time) - new Date(a.submission_time));
+
+            let html = `
+                <div class="success">
+                    📊 Combined Data Preview (${combinedData.length} total records)
+                    <br>🏠 Local: ${localData.length} records
+                    <br>🌍 Remote: ${processedRemoteData.length} records
+                </div>
+                <div class="code">
+Name                | Date      | Score | Source
+-------------------|-----------|-------|--------
+`;
+
+            combinedData.forEach(item => {
+                const name = item.participant_name.padEnd(18);
+                const date = new Date(item.submission_time).toLocaleDateString().padEnd(10);
+                const score = item.overall_osdi.toFixed(1).padStart(5);
+                const source = item.source === 'local' ? '🏠 Local' : '🌍 Remote';
+                html += `${name}| ${date}| ${score} | ${source}\n`;
+            });
+
+            html += '</div>';
+            document.getElementById('combinedDataPreview').innerHTML = html;
+        }
+
+        // Auto-create sample data on page load for demo
+        document.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('demo_international_data')) {
+                createSampleData();
+            }
+        });
+    </script>
+</body>
+</html>

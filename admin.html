@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #fff2f6 50%, #ffe8ed 75%, #ffeef2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+
+
+        .data-table {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(208, 31, 62, 0.1);
+            margin-top: 20px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .table-title {
+            font-size: 1.5em;
+            color: #D01F3E;
+            font-weight: 600;
+        }
+
+        .refresh-btn {
+            background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: linear-gradient(135deg, #b71c3b 0%, #d42850 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(208, 31, 62, 0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ffe8ed;
+        }
+
+        th {
+            background: linear-gradient(135deg, #ffd4dd 0%, #ffe8ed 100%);
+            color: #D01F3E;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        td {
+            background: rgba(255, 255, 255, 0.5);
+            transition: background 0.3s ease;
+        }
+
+        tr:hover td {
+            background: rgba(208, 31, 62, 0.05);
+        }
+
+        .score {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .score.normal { color: #4caf50; }
+        .score.mild { color: #ffc107; }
+        .score.moderate { color: #ff9800; }
+        .score.severe { color: #D01F3E; }
+
+        .no-data {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #D01F3E;
+            padding: 40px;
+        }
+
+        .error {
+            text-align: center;
+            color: #D01F3E;
+            padding: 40px;
+            background: #ffebee;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .data-table {
+                padding: 20px;
+                overflow-x: auto;
+                margin-top: 10px;
+            }
+            
+            table {
+                min-width: 500px;
+            }
+            
+            th, td {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+
+
+        <div class="data-table">
+            <div class="table-header">
+                <div class="table-title">Survey Results</div>
+                <button class="refresh-btn" onclick="loadAllData()">🔄 Refresh</button>
+            </div>
+
+            <div id="tableContainer">
+                <div class="loading">Loading data...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load all survey data
+        async function loadAllData() {
+            const container = document.getElementById('tableContainer');
+            container.innerHTML = '<div class="loading">Loading data...</div>';
+            
+            let allData = [];
+
+            try {
+                // For Netlify deployment, only load from localStorage
+                console.log('Loading data from localStorage for static deployment...');
+                
+                // Load from localStorage (works for static sites like Netlify)
+                const localData = loadLocalData();
+                allData = allData.concat(localData);
+
+                // Remove duplicates and sort by date
+                allData = removeDuplicates(allData);
+                allData.sort((a, b) => new Date(b.submission_time) - new Date(a.submission_time));
+                
+                displayData(allData);
+                
+                console.log(`Loaded ${allData.length} records from localStorage`);
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                container.innerHTML = '<div class="error">Error loading data: ' + error.message + '</div>';
+            }
+        }
+
+        // Legacy function for compatibility
+        async function loadData() {
+            await loadAllData();
+        }
+
+        // Load data from localStorage
+        function loadLocalData() {
+            const data = [];
+            
+            // Get all localStorage keys
+            const keys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                keys.push(localStorage.key(i));
+            }
+            
+            console.log('Available localStorage keys:', keys);
+            
+            // Load data from survey_ prefixed keys
+            keys.forEach(key => {
+                if (key && key.startsWith('survey_')) {
+                    try {
+                        const item = JSON.parse(localStorage.getItem(key));
+                        console.log('Processing survey item:', key, item);
+                        
+                        if (item && item.timestamp) {
+                            data.push({
+                                participant_name: item.participantName || 'Anonymous',
+                                submission_time: item.timestamp,
+                                overall_osdi: item.overallOSDI || 0
+                            });
+                        }
+                    } catch (e) {
+                        console.warn('Error parsing localStorage item:', key, e);
+                    }
+                }
+            });
+            
+            // Also check for the old 'eyeComfortSurvey' key for backward compatibility
+            const oldData = localStorage.getItem('eyeComfortSurvey');
+            if (oldData) {
+                try {
+                    const item = JSON.parse(oldData);
+                    console.log('Processing old format data:', item);
+                    
+                    if (item && item.timestamp) {
+                        // Convert old format to new format
+                        const convertedData = {
+                            participant_name: item.participantName || item.data?.participantName || 'Anonymous',
+                            submission_time: item.timestamp,
+                            overall_osdi: item.overallOSDI || 0
+                        };
+                        
+                        // Check if this data already exists (avoid duplicates)
+                        const exists = data.some(d => 
+                            d.participant_name === convertedData.participant_name && 
+                            d.submission_time === convertedData.submission_time
+                        );
+                        
+                        if (!exists) {
+                            data.push(convertedData);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('Error parsing old format data:', e);
+                }
+            }
+            
+            console.log('Total loaded records:', data.length);
+            return data;
+        }
+
+        // Remove duplicate entries
+        function removeDuplicates(data) {
+            const seen = new Set();
+            return data.filter(item => {
+                const key = `${item.participant_name}_${item.submission_time}_${item.overall_osdi}`;
+                if (seen.has(key)) {
+                    return false;
+                }
+                seen.add(key);
+                return true;
+            });
+        }
+
+        // Display data in table
+        function displayData(submissions) {
+            const container = document.getElementById('tableContainer');
+            
+            if (!submissions || submissions.length === 0) {
+                container.innerHTML = '<div class="no-data">No survey data found.</div>';
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Name</th><th>Date</th><th>Score</th></tr></thead><tbody>';
+            
+            submissions.forEach(submission => {
+                const name = submission.participant_name || 'Anonymous';
+                const date = formatDate(submission.submission_time);
+                const score = (submission.overall_osdi || 0).toFixed(1);
+                const scoreClass = getScoreClass(score);
+                
+                html += `<tr>
+                    <td>${escapeHtml(name)}</td>
+                    <td>${date}</td>
+                    <td class="score ${scoreClass}">${score}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Get CSS class for score color
+        function getScoreClass(score) {
+            const numScore = parseFloat(score);
+            if (numScore >= 33) return 'severe';
+            if (numScore >= 23) return 'moderate';
+            if (numScore >= 13) return 'mild';
+            return 'normal';
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadAllData, 30000);
+
+        // Load data on page load
+        document.addEventListener('DOMContentLoaded', loadAllData);
+    </script>
+</body>
+</html>

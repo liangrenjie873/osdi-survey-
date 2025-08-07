@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glasses Discomfort Survey</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <!-- KOUSHICARE Logo -->
+            <div class="header-logo" onclick="openAdminPanel()" title="Click to access admin panel" style="cursor: pointer;">
+                <img src="images/koushicare-logo.png" alt="KOUSHICARE" class="main-logo">
+            </div>
+            
+            <h1>Glasses Discomfort Survey</h1>
+            <p>Please select the option that best describes your experience</p>
+        </header>
+
+        <form id="surveyForm">
+            <!-- Personal Information Section -->
+            <section class="survey-section">
+                <h2>Personal Information</h2>
+                <div class="question-group">
+                    <div class="question">
+                        <h3>Name *</h3>
+                        <div class="name-input-container">
+                            <input type="text" id="participantName" name="participantName" 
+                                   placeholder="Enter your name" 
+                                   class="name-input" required
+                                   oninvalid="this.setCustomValidity('Please enter your name')"
+                                   oninput="this.setCustomValidity('')">
+                            <small class="input-note">Required for survey identification</small>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Part 1: The degree of discomfort of the glasses in a particular environment -->
+            <section class="survey-section">
+                <h2>The degree of discomfort of the glasses in a particular environment</h2>
+                <div class="question-group">
+                    <div class="question">
+                        <h3>windy</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="windy1" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="windy1" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="windy1" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="windy1" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="windy1" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>dry</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="dry" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="dry" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="dry" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="dry" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="dry" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>windy</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="windy2" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="windy2" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="windy2" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="windy2" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="windy2" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part 2: The degree of eye discomfort -->
+            <section class="survey-section">
+                <h2>The degree of eye discomfort</h2>
+                <div class="question-group">
+                    <div class="question">
+                        <h3>photophobia</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="photophobia" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="photophobia" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="photophobia" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="photophobia" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="photophobia" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>feeling of sand in the eyes</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="sandFeeling" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="sandFeeling" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="sandFeeling" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="sandFeeling" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="sandFeeling" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>pain/swelling</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="painSwelling" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="painSwelling" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="painSwelling" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="painSwelling" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="painSwelling" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>blurred vision</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="blurredVision" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="blurredVision" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="blurredVision" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="blurredVision" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="blurredVision" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>decreased vision</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="decreasedVision" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="decreasedVision" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="decreasedVision" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="decreasedVision" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="decreasedVision" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Part 3: Daily eye habits -->
+            <section class="survey-section">
+                <h2>Daily eye habits</h2>
+                <div class="question-group">
+                    <div class="question">
+                        <h3>reading</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="reading" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="reading" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="reading" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="reading" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="reading" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>driving at night</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="nightDriving" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="nightDriving" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="nightDriving" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="nightDriving" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="nightDriving" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>using computer</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="computerUse" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="computerUse" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="computerUse" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="computerUse" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="computerUse" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="question">
+                        <h3>watching TV</h3>
+                        <div class="options">
+                            <label class="option">
+                                <input type="radio" name="watchingTV" value="4">
+                                <span class="option-text">always</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="watchingTV" value="3">
+                                <span class="option-text">usually</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="watchingTV" value="2">
+                                <span class="option-text">half time</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="watchingTV" value="1">
+                                <span class="option-text">sometimes</span>
+                            </label>
+                            <label class="option">
+                                <input type="radio" name="watchingTV" value="0">
+                                <span class="option-text">never</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="submit-section">
+                <button type="submit" class="submit-btn">Submit</button>
+            </div>
+        </form>
+
+        <div id="result" class="result-section" style="display: none;">
+            <h2>Survey Results</h2>
+            <div id="resultContent"></div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netlify Fix Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff2f6 50%, #ffe8ed 75%, #ffeef2 100%);
+        }
+        .test-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 2px solid rgba(208, 31, 62, 0.1);
+        }
+        .test-card h3 {
+            color: #D01F3E;
+            margin-bottom: 15px;
+        }
+        button {
+            background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 1em;
+        }
+        button:hover {
+            background: linear-gradient(135deg, #b71c3b 0%, #d42850 100%);
+        }
+        .result {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            margin: 10px 0;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .warning {
+            background: #fff3e0;
+            color: #f57c00;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Netlify数据同步修复测试</h1>
+    <p>这个页面帮助您测试Netlify部署后的数据同步是否正常工作。</p>
+
+    <div class="test-card">
+        <h3>1. 📋 检查当前localStorage数据</h3>
+        <p>查看浏览器中保存的所有调查数据：</p>
+        <button onclick="checkLocalStorage()">检查localStorage</button>
+        <div id="localStorageResult"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>2. 🧪 创建测试数据</h3>
+        <p>创建一个测试调查记录，模拟用户填写问卷：</p>
+        <button onclick="createTestData()">创建测试数据</button>
+        <div id="testDataResult"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>3. 🔍 测试管理后台读取</h3>
+        <p>模拟管理后台的数据读取逻辑：</p>
+        <button onclick="testAdminRead()">测试管理后台读取</button>
+        <div id="adminReadResult"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>4. 🗑️ 清理测试数据</h3>
+        <p>清理所有测试数据，重新开始：</p>
+        <button onclick="clearAllData()" style="background: #666;">清理所有数据</button>
+        <div id="clearResult"></div>
+    </div>
+
+    <div class="test-card">
+        <h3>5. 🚀 访问真实页面</h3>
+        <p>在测试完成后，访问真实的问卷和管理页面：</p>
+        <button onclick="openSurvey()">打开问卷页面</button>
+        <button onclick="openAdmin()">打开管理后台</button>
+        <p><small>管理后台密码：123456</small></p>
+    </div>
+
+    <script>
+        // 1. 检查localStorage数据
+        function checkLocalStorage() {
+            const resultDiv = document.getElementById('localStorageResult');
+            
+            try {
+                const keys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    keys.push(localStorage.key(i));
+                }
+                
+                if (keys.length === 0) {
+                    resultDiv.innerHTML = '<div class="warning">⚠️ localStorage中没有找到任何数据</div>';
+                    return;
+                }
+                
+                let result = `找到 ${keys.length} 个localStorage项目:\n\n`;
+                
+                keys.forEach(key => {
+                    try {
+                        const value = localStorage.getItem(key);
+                        if (key.startsWith('survey_') || key === 'eyeComfortSurvey') {
+                            const data = JSON.parse(value);
+                            result += `🔑 ${key}:\n`;
+                            result += `   姓名: ${data.participantName || 'N/A'}\n`;
+                            result += `   时间: ${data.timestamp || 'N/A'}\n`;
+                            result += `   分数: ${data.overallOSDI || 'N/A'}\n\n`;
+                        } else {
+                            result += `🔑 ${key}: (非调查数据)\n\n`;
+                        }
+                    } catch (e) {
+                        result += `🔑 ${key}: (格式错误)\n\n`;
+                    }
+                });
+                
+                resultDiv.innerHTML = `<div class="success">✅ 数据检查完成</div><div class="result">${result}</div>`;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 检查失败: ${error.message}</div>`;
+            }
+        }
+
+        // 2. 创建测试数据
+        function createTestData() {
+            const resultDiv = document.getElementById('testDataResult');
+            
+            try {
+                const timestamp = new Date().toISOString();
+                const testData = {
+                    participantName: 'Test User ' + Date.now(),
+                    // 模拟一些问卷答案
+                    windy1: 2,
+                    windy2: 3,
+                    windy3: 1,
+                    windy4: 2,
+                    windy5: 3,
+                    windy6: 1,
+                    windy7: 2,
+                    windy8: 3,
+                    windy9: 1,
+                    windy10: 2,
+                    windy11: 3,
+                    windy12: 1
+                };
+                
+                // 计算OSDI分数
+                let totalScore = 0;
+                let totalQuestions = 0;
+                Object.keys(testData).forEach(key => {
+                    if (key !== 'participantName' && typeof testData[key] === 'number') {
+                        totalScore += testData[key];
+                        totalQuestions++;
+                    }
+                });
+                
+                const overallOSDI = totalQuestions > 0 ? Math.round(((totalScore * 25) / totalQuestions) * 10) / 10 : 0;
+                
+                const surveyResult = {
+                    data: testData,
+                    timestamp: timestamp,
+                    date: new Date().toLocaleDateString('en-US'),
+                    participantName: testData.participantName,
+                    overallOSDI: overallOSDI
+                };
+                
+                // 保存数据（使用新的键名格式）
+                const surveyKey = `survey_${timestamp.replace(/[:.]/g, '_')}`;
+                localStorage.setItem(surveyKey, JSON.stringify(surveyResult));
+                localStorage.setItem('eyeComfortSurvey', JSON.stringify(surveyResult));
+                
+                resultDiv.innerHTML = `
+                    <div class="success">✅ 测试数据创建成功</div>
+                    <div class="result">创建的测试数据:
+键名: ${surveyKey}
+姓名: ${testData.participantName}
+OSDI分数: ${overallOSDI}
+时间: ${timestamp}
+
+数据已保存到localStorage中，管理后台应该能够读取到这条记录。</div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 创建测试数据失败: ${error.message}</div>`;
+            }
+        }
+
+        // 3. 测试管理后台读取逻辑
+        function testAdminRead() {
+            const resultDiv = document.getElementById('adminReadResult');
+            
+            try {
+                // 复制admin.html中的loadLocalData逻辑
+                const data = [];
+                
+                // Get all localStorage keys
+                const keys = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    keys.push(localStorage.key(i));
+                }
+                
+                let result = `管理后台数据读取测试:\n\n`;
+                result += `找到localStorage键名: ${keys.join(', ')}\n\n`;
+                
+                // Load data from survey_ prefixed keys
+                keys.forEach(key => {
+                    if (key && key.startsWith('survey_')) {
+                        try {
+                            const item = JSON.parse(localStorage.getItem(key));
+                            if (item && item.timestamp) {
+                                data.push({
+                                    participant_name: item.participantName || 'Anonymous',
+                                    submission_time: item.timestamp,
+                                    overall_osdi: item.overallOSDI || 0
+                                });
+                                result += `✅ 成功读取: ${key}\n`;
+                                result += `   姓名: ${item.participantName}\n`;
+                                result += `   分数: ${item.overallOSDI}\n\n`;
+                            }
+                        } catch (e) {
+                            result += `❌ 解析失败: ${key} - ${e.message}\n\n`;
+                        }
+                    }
+                });
+                
+                // Also check for the old 'eyeComfortSurvey' key
+                const oldData = localStorage.getItem('eyeComfortSurvey');
+                if (oldData) {
+                    try {
+                        const item = JSON.parse(oldData);
+                        if (item && item.timestamp) {
+                            const convertedData = {
+                                participant_name: item.participantName || item.data?.participantName || 'Anonymous',
+                                submission_time: item.timestamp,
+                                overall_osdi: item.overallOSDI || 0
+                            };
+                            
+                            // Check if this data already exists
+                            const exists = data.some(d => 
+                                d.participant_name === convertedData.participant_name && 
+                                d.submission_time === convertedData.submission_time
+                            );
+                            
+                            if (!exists) {
+                                data.push(convertedData);
+                                result += `✅ 兼容性读取: eyeComfortSurvey\n`;
+                                result += `   姓名: ${convertedData.participant_name}\n`;
+                                result += `   分数: ${convertedData.overall_osdi}\n\n`;
+                            } else {
+                                result += `⚠️ 跳过重复数据: eyeComfortSurvey\n\n`;
+                            }
+                        }
+                    } catch (e) {
+                        result += `❌ 旧格式解析失败: ${e.message}\n\n`;
+                    }
+                }
+                
+                result += `\n📊 管理后台将显示 ${data.length} 条记录:\n\n`;
+                data.forEach((item, index) => {
+                    result += `${index + 1}. ${item.participant_name} - ${new Date(item.submission_time).toLocaleDateString()} - ${item.overall_osdi}\n`;
+                });
+                
+                if (data.length > 0) {
+                    resultDiv.innerHTML = `<div class="success">✅ 管理后台读取测试成功</div><div class="result">${result}</div>`;
+                } else {
+                    resultDiv.innerHTML = `<div class="error">❌ 管理后台无法读取到任何数据</div><div class="result">${result}</div>`;
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 管理后台读取测试失败: ${error.message}</div>`;
+            }
+        }
+
+        // 4. 清理所有数据
+        function clearAllData() {
+            const resultDiv = document.getElementById('clearResult');
+            
+            if (!confirm('确定要清理所有localStorage数据吗？这将删除所有调查记录！')) {
+                return;
+            }
+            
+            try {
+                // 找到所有调查相关的键名
+                const keysToRemove = [];
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && (key.startsWith('survey_') || key === 'eyeComfortSurvey')) {
+                        keysToRemove.push(key);
+                    }
+                }
+                
+                // 删除所有相关键名
+                keysToRemove.forEach(key => {
+                    localStorage.removeItem(key);
+                });
+                
+                resultDiv.innerHTML = `<div class="success">✅ 清理完成，删除了 ${keysToRemove.length} 个数据项</div>`;
+                
+                // 更新其他结果区域
+                setTimeout(() => {
+                    document.getElementById('localStorageResult').innerHTML = '';
+                    document.getElementById('testDataResult').innerHTML = '';
+                    document.getElementById('adminReadResult').innerHTML = '';
+                }, 1000);
+                
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ 清理失败: ${error.message}</div>`;
+            }
+        }
+
+        // 5. 打开真实页面
+        function openSurvey() {
+            window.open('index.html', '_blank');
+        }
+
+        function openAdmin() {
+            window.open('admin.html', '_blank');
+        }
+
+        // 页面加载时自动检查
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLocalStorage();
+        });
+    </script>
+</body>
+</html>

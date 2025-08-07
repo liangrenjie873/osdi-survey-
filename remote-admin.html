@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #fff2f6 50%, #ffe8ed 75%, #ffeef2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .sync-controls {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-group label {
+            font-weight: 600;
+            color: #D01F3E;
+            min-width: 120px;
+        }
+
+        .control-group input, .control-group select {
+            padding: 10px 15px;
+            border: 2px solid #ffe8ed;
+            border-radius: 8px;
+            font-size: 1em;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .sync-btn, .export-btn {
+            background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .sync-btn:hover, .export-btn:hover {
+            background: linear-gradient(135deg, #b71c3b 0%, #d42850 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(208, 31, 62, 0.3);
+        }
+
+        .data-table {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid rgba(208, 31, 62, 0.1);
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .table-title {
+            font-size: 1.5em;
+            color: #D01F3E;
+            font-weight: 600;
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .stat-item {
+            background: #f8f9fa;
+            padding: 8px 15px;
+            border-radius: 6px;
+            border: 1px solid #ffe8ed;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ffe8ed;
+        }
+
+        th {
+            background: linear-gradient(135deg, #ffd4dd 0%, #ffe8ed 100%);
+            color: #D01F3E;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        td {
+            background: rgba(255, 255, 255, 0.5);
+            transition: background 0.3s ease;
+        }
+
+        tr:hover td {
+            background: rgba(208, 31, 62, 0.05);
+        }
+
+        .score {
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .score.normal { color: #4caf50; }
+        .score.mild { color: #ffc107; }
+        .score.moderate { color: #ff9800; }
+        .score.severe { color: #D01F3E; }
+
+        .source-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+
+        .source-local {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .source-remote {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status.success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            border: 1px solid #4caf50;
+        }
+
+        .status.error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #f44336;
+        }
+
+        .status.info {
+            background: #e3f2fd;
+            color: #1976d2;
+            border: 1px solid #2196f3;
+        }
+
+        .no-data {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #D01F3E;
+            padding: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .sync-controls, .data-table {
+                padding: 20px;
+            }
+            
+            .control-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .control-group label {
+                min-width: auto;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .data-table {
+                overflow-x: auto;
+            }
+            
+            table {
+                min-width: 600px;
+            }
+            
+            th, td {
+                padding: 10px;
+                font-size: 0.9em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌍 Remote Admin Dashboard</h1>
+            <p>Manage Global Survey Data</p>
+        </div>
+
+        <div class="sync-controls">
+            <h3 style="color: #D01F3E; margin-bottom: 20px;">🔗 Remote Data Sync</h3>
+            
+            <div class="control-group">
+                <label>Remote URL:</label>
+                <input type="url" id="remoteUrl" placeholder="https://your-remote-site.com/api/survey/export" 
+                       value="https://your-domain.com/api/survey/export">
+            </div>
+            
+            <div class="control-group">
+                <label>Sync Method:</label>
+                <select id="syncMethod">
+                    <option value="api">API Endpoint</option>
+                    <option value="json">JSON File</option>
+                    <option value="csv">CSV File</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Auth Key:</label>
+                <input type="password" id="authKey" placeholder="Optional authentication key">
+            </div>
+            
+            <div class="control-group">
+                <button class="sync-btn" onclick="syncRemoteData()">🔄 Sync Remote Data</button>
+                <button class="export-btn" onclick="exportLocalData()">💾 Export Local Data</button>
+                <button class="sync-btn" onclick="loadLocalData()">📂 Load Local Data</button>
+            </div>
+            
+            <div id="statusMessage"></div>
+        </div>
+
+        <div class="data-table">
+            <div class="table-header">
+                <div class="table-title">Global Survey Results</div>
+                <div class="stats">
+                    <div class="stat-item">Total: <span id="totalCount">0</span></div>
+                    <div class="stat-item">Local: <span id="localCount">0</span></div>
+                    <div class="stat-item">Remote: <span id="remoteCount">0</span></div>
+                </div>
+            </div>
+
+            <div id="tableContainer">
+                <div class="loading">Click "Load Local Data" or "Sync Remote Data" to view results</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allData = [];
+
+        // Show status message
+        function showStatus(message, type = 'info') {
+            const container = document.getElementById('statusMessage');
+            container.innerHTML = `<div class="status ${type}">${message}</div>`;
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                container.innerHTML = '';
+            }, 5000);
+        }
+
+        // Sync remote data
+        async function syncRemoteData() {
+            const remoteUrl = document.getElementById('remoteUrl').value;
+            const authKey = document.getElementById('authKey').value;
+            const syncMethod = document.getElementById('syncMethod').value;
+            
+            if (!remoteUrl) {
+                showStatus('Please enter a remote URL', 'error');
+                return;
+            }
+
+            showStatus('🔄 Syncing remote data...', 'info');
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json'
+                };
+                
+                if (authKey) {
+                    headers['Authorization'] = `Bearer ${authKey}`;
+                }
+
+                const response = await fetch(remoteUrl, { headers });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                let remoteData;
+                if (syncMethod === 'csv') {
+                    const csvText = await response.text();
+                    remoteData = parseCSV(csvText);
+                } else {
+                    remoteData = await response.json();
+                }
+
+                // Process and merge data
+                const processedData = processRemoteData(remoteData);
+                mergeData(processedData, 'remote');
+                
+                showStatus(`✅ Successfully synced ${processedData.length} records from remote site`, 'success');
+                displayData();
+                
+            } catch (error) {
+                console.error('Sync error:', error);
+                showStatus(`❌ Sync failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Load local data
+        function loadLocalData() {
+            showStatus('📂 Loading local data...', 'info');
+            
+            const localData = [];
+            
+            // Load from localStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('survey_')) {
+                    try {
+                        const item = JSON.parse(localStorage.getItem(key));
+                        if (item && item.timestamp) {
+                            localData.push({
+                                participant_name: item.participantName || 'Anonymous',
+                                submission_time: item.timestamp,
+                                overall_osdi: item.overallOSDI || 0,
+                                source: 'local'
+                            });
+                        }
+                    } catch (e) {
+                        console.warn('Error parsing localStorage item:', key);
+                    }
+                }
+            }
+            
+            mergeData(localData, 'local');
+            showStatus(`📂 Loaded ${localData.length} local records`, 'success');
+            displayData();
+        }
+
+        // Process remote data to standard format
+        function processRemoteData(data) {
+            if (!Array.isArray(data)) {
+                if (data.submissions) {
+                    data = data.submissions;
+                } else if (data.data) {
+                    data = data.data;
+                } else {
+                    throw new Error('Invalid data format');
+                }
+            }
+
+            return data.map(item => ({
+                participant_name: item.participant_name || item.name || item.participantName || 'Anonymous',
+                submission_time: item.submission_time || item.date || item.timestamp || new Date().toISOString(),
+                overall_osdi: parseFloat(item.overall_osdi || item.score || item.osdi || 0),
+                source: 'remote'
+            }));
+        }
+
+        // Parse CSV data
+        function parseCSV(csvText) {
+            const lines = csvText.trim().split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            
+            const data = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                const item = {};
+                headers.forEach((header, index) => {
+                    item[header] = values[index] ? values[index].trim() : '';
+                });
+                data.push(item);
+            }
+            
+            return data;
+        }
+
+        // Merge data arrays
+        function mergeData(newData, source) {
+            // Remove existing data from same source
+            allData = allData.filter(item => item.source !== source);
+            
+            // Add new data with source tag
+            newData.forEach(item => {
+                item.source = source;
+            });
+            
+            allData = allData.concat(newData);
+            
+            // Sort by date (newest first)
+            allData.sort((a, b) => new Date(b.submission_time) - new Date(a.submission_time));
+        }
+
+        // Display data in table
+        function displayData() {
+            const container = document.getElementById('tableContainer');
+            
+            if (!allData || allData.length === 0) {
+                container.innerHTML = '<div class="no-data">No survey data found.</div>';
+                updateStats(0, 0, 0);
+                return;
+            }
+
+            let html = '<table><thead><tr><th>Name</th><th>Date</th><th>Score</th><th>Source</th></tr></thead><tbody>';
+            
+            let localCount = 0, remoteCount = 0;
+            
+            allData.forEach(submission => {
+                const name = submission.participant_name || 'Anonymous';
+                const date = formatDate(submission.submission_time);
+                const score = (submission.overall_osdi || 0).toFixed(1);
+                const scoreClass = getScoreClass(score);
+                const sourceClass = submission.source === 'local' ? 'source-local' : 'source-remote';
+                const sourceText = submission.source === 'local' ? '🏠 Local' : '🌍 Remote';
+                
+                if (submission.source === 'local') localCount++;
+                else remoteCount++;
+                
+                html += `<tr>
+                    <td>${escapeHtml(name)}</td>
+                    <td>${date}</td>
+                    <td class="score ${scoreClass}">${score}</td>
+                    <td><span class="source-tag ${sourceClass}">${sourceText}</span></td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+            
+            updateStats(allData.length, localCount, remoteCount);
+        }
+
+        // Update statistics
+        function updateStats(total, local, remote) {
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('localCount').textContent = local;
+            document.getElementById('remoteCount').textContent = remote;
+        }
+
+        // Export local data
+        function exportLocalData() {
+            const localData = allData.filter(item => item.source === 'local');
+            
+            if (localData.length === 0) {
+                showStatus('No local data to export', 'error');
+                return;
+            }
+            
+            const exportData = {
+                export_time: new Date().toISOString(),
+                version: '1.0',
+                submissions: localData
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(dataBlob);
+            link.download = `osdi-survey-export-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            
+            showStatus(`💾 Exported ${localData.length} local records`, 'success');
+        }
+
+        // Format date for display
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Get CSS class for score color
+        function getScoreClass(score) {
+            const numScore = parseFloat(score);
+            if (numScore >= 33) return 'severe';
+            if (numScore >= 23) return 'moderate';
+            if (numScore >= 13) return 'mild';
+            return 'normal';
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Auto-load local data on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadLocalData();
+        });
+    </script>
+</body>
+</html>
