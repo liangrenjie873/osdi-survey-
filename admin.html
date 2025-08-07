@@ -329,6 +329,8 @@
         function displayData(submissions) {
             const container = document.getElementById('tableContainer');
             
+            console.log('displayData called with:', submissions);
+            
             if (!submissions || submissions.length === 0) {
                 container.innerHTML = '<div class="no-data">No survey data found.</div>';
                 return;
@@ -336,7 +338,9 @@
 
             let html = '<table><thead><tr><th>Name</th><th>Date</th><th>Score</th></tr></thead><tbody>';
             
-            submissions.forEach(submission => {
+            submissions.forEach((submission, index) => {
+                console.log(`Processing submission ${index}:`, submission);
+                
                 const name = submission.participant_name || 'Anonymous';
                 const date = formatDate(submission.submission_time);
                 const score = (submission.overall_osdi || 0).toFixed(1);
@@ -351,6 +355,8 @@
             
             html += '</tbody></table>';
             container.innerHTML = html;
+            
+            console.log('Table HTML generated:', html);
         }
 
         // Format date for display
