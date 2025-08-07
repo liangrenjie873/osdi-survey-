@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Admin Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffffff 0%, #fff2f6 100%);
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .logo {
+            width: 200px;
+            height: auto;
+            margin: 20px 0;
+            cursor: pointer;
+            border: 2px solid #D01F3E;
+            border-radius: 10px;
+            padding: 10px;
+            transition: all 0.3s ease;
+        }
+        .logo:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(208, 31, 62, 0.3);
+        }
+        .button {
+            background: #D01F3E;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background: #b71c3b;
+            transform: translateY(-2px);
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🔧 管理员界面测试</h1>
+        
+        <div class="status info">
+            📋 测试说明：点击logo或按钮来测试管理员访问功能
+        </div>
+        
+        <h2>🎯 测试方法1：点击Logo</h2>
+        <img src="images/koushicare-logo.png" alt="KOUSHICARE" class="logo" onclick="testAdminAccess()">
+        <p>点击上面的logo测试管理员访问</p>
+        
+        <h2>🎯 测试方法2：点击按钮</h2>
+        <button class="button" onclick="testAdminAccess()">测试管理员访问</button>
+        
+        <h2>🎯 测试方法3：直接访问</h2>
+        <a href="admin.html" class="button" target="_blank">直接访问管理员界面</a>
+        
+        <div id="testResult" class="status" style="display: none;"></div>
+        
+        <h3>📊 测试结果</h3>
+        <div id="testResults">
+            <div class="status info">
+                ⏳ 等待测试...
+            </div>
+        </div>
+        
+        <h3>🔧 故障排除</h3>
+        <ul style="text-align: left;">
+            <li>✅ 确保JavaScript已启用</li>
+            <li>✅ 检查浏览器控制台是否有错误</li>
+            <li>✅ 确认admin.html文件存在</li>
+            <li>✅ 验证服务器配置正确</li>
+        </ul>
+    </div>
+
+    <script>
+        function testAdminAccess() {
+            console.log('Testing admin access...');
+            
+            try {
+                // Request password
+                const password = prompt('Enter admin password:');
+                
+                if (password === '123456') {
+                    console.log('Password correct!');
+                    document.getElementById('testResult').innerHTML = 
+                        '<div class="status success">✅ 密码正确！正在跳转到管理员界面...</div>';
+                    document.getElementById('testResult').style.display = 'block';
+                    
+                    // Redirect to admin panel
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 1000);
+                    
+                } else if (password !== null) {
+                    console.log('Wrong password');
+                    document.getElementById('testResult').innerHTML = 
+                        '<div class="status error">❌ 密码错误！</div>';
+                    document.getElementById('testResult').style.display = 'block';
+                } else {
+                    console.log('User cancelled');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('testResult').innerHTML = 
+                    '<div class="status error">❌ 发生错误：' + error.message + '</div>';
+                document.getElementById('testResult').style.display = 'block';
+            }
+        }
+        
+        // 页面加载时自动测试
+        window.onload = function() {
+            console.log('Page loaded, testing admin.html availability...');
+            
+            // 测试admin.html是否存在
+            fetch('admin.html', { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        document.getElementById('testResults').innerHTML = 
+                            '<div class="status success">✅ admin.html 文件存在且可访问</div>';
+                    } else {
+                        document.getElementById('testResults').innerHTML = 
+                            '<div class="status error">❌ admin.html 文件不存在或无法访问</div>';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('testResults').innerHTML = 
+                        '<div class="status error">❌ 无法访问 admin.html: ' + error.message + '</div>';
+                });
+        };
+    </script>
+</body>
+</html> 

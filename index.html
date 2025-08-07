@@ -381,5 +381,41 @@
     </div>
 
     <script src="script.js"></script>
+    <script>
+        // 确保openAdminPanel函数可用
+        function openAdminPanel() {
+            try {
+                console.log('openAdminPanel function called');
+                
+                // Request password
+                const password = prompt('Enter admin password:');
+                
+                if (password === '123456') {
+                    // Correct password, redirect to unified admin panel
+                    console.log('Password correct, redirecting to admin panel...');
+                    window.location.href = 'admin.html';
+                } else if (password !== null) {
+                    // Wrong password (null means user cancelled)
+                    alert('Incorrect password!');
+                }
+            } catch (error) {
+                console.error('Error opening admin panel:', error);
+                // Fallback: try direct navigation
+                window.location.href = 'admin.html';
+            }
+        }
+        
+        // 确保页面加载完成后函数可用
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, openAdminPanel function is available');
+            
+            // 为logo添加点击事件
+            const logo = document.querySelector('.header-logo');
+            if (logo) {
+                logo.onclick = openAdminPanel;
+                console.log('Logo click event added');
+            }
+        });
+    </script>
 </body>
 </html>
