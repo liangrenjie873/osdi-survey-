@@ -162,10 +162,21 @@
         }
 
         // 页面加载时自动开始
-        window.onload = function() {
+        document.addEventListener('DOMContentLoaded', function() {
             log('页面加载完成，开始调试...');
             loadData();
-        };
+        });
+        
+        // 备用方案
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                log('DOMContentLoaded触发，开始调试...');
+                loadData();
+            });
+        } else {
+            log('页面已加载，直接开始调试...');
+            loadData();
+        }
     </script>
 </body>
 </html> 

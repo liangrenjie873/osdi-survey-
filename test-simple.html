@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>简单测试</title>
+</head>
+<body>
+    <h1>简单测试页面</h1>
+    <div id="result">等待中...</div>
+    
+    <script>
+        console.log('JavaScript开始执行');
+        
+        document.getElementById('result').innerHTML = 'JavaScript正常工作！';
+        
+        // 测试API调用
+        fetch('/api/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('API响应:', data);
+                document.getElementById('result').innerHTML = 
+                    'JavaScript正常工作！<br>API响应: ' + JSON.stringify(data);
+            })
+            .catch(error => {
+                console.error('API错误:', error);
+                document.getElementById('result').innerHTML = 
+                    'JavaScript正常工作！<br>API错误: ' + error.message;
+            });
+    </script>
+</body>
+</html> 
