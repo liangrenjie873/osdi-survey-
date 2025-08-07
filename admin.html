@@ -171,62 +171,40 @@
             const container = document.getElementById('tableContainer');
             container.innerHTML = '<div class="loading">Loading data...</div>';
             
-            let allData = [];
-
             try {
-                console.log('Loading data from server and localStorage...');
+                console.log('开始加载数据...');
                 
                 // Try to load from server first
-                try {
-                    const response = await fetch('/api/survey/recent/100');
-                    if (response.ok) {
-                        const serverData = await response.json();
-                        console.log('Server response:', serverData);
-                        
-                        // Handle server data format
-                        if (Array.isArray(serverData)) {
-                            // Direct array format
-                            const formattedData = serverData.map(item => ({
-                                participant_name: item.participant_name || 'Anonymous',
-                                submission_time: item.submission_time,
-                                overall_osdi: item.overall_osdi || 0
-                            }));
-                            allData = allData.concat(formattedData);
-                            console.log('Loaded data from server:', formattedData.length, 'records');
-                        } else if (serverData.submissions) {
-                            // Wrapped format
-                            const formattedData = serverData.submissions.map(item => ({
-                                participant_name: item.participant_name || 'Anonymous',
-                                submission_time: item.submission_time,
-                                overall_osdi: item.overall_osdi || 0
-                            }));
-                            allData = allData.concat(formattedData);
-                            console.log('Loaded data from server:', formattedData.length, 'records');
-                        }
-                    }
-                } catch (serverError) {
-                    console.log('Server not available, loading from localStorage only:', serverError);
+                const response = await fetch('/api/survey/recent/100');
+                console.log('API响应状态:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                // Also load from localStorage (for backward compatibility)
-                const localData = loadLocalData();
-                allData = allData.concat(localData);
-
-                // Remove duplicates and sort by date
-                allData = removeDuplicates(allData);
-                allData.sort((a, b) => new Date(b.submission_time) - new Date(a.submission_time));
+                const serverData = await response.json();
+                console.log('服务器返回数据:', serverData);
                 
-                displayData(allData);
+                if (!Array.isArray(serverData)) {
+                    throw new Error('服务器返回的数据不是数组格式');
+                }
                 
-                console.log(`Loaded ${allData.length} records from localStorage`);
+                // Format server data
+                const formattedData = serverData.map(item => ({
+                    participant_name: item.participant_name || 'Anonymous',
+                    submission_time: item.submission_time,
+                    overall_osdi: item.overall_osdi || 0
+                }));
                 
-                // If no data found, show empty state
-                if (allData.length === 0) {
+                console.log('格式化后的数据:', formattedData);
+                
+                // Display data
+                if (formattedData.length === 0) {
                     container.innerHTML = `
                         <div style="text-align: center; padding: 40px; color: #666;">
-                            <h3>📊 No Survey Data Found</h3>
-                            <p>No survey submissions have been recorded yet.</p>
-                            <p>Data will appear here after users submit the OSDI survey.</p>
+                            <h3>📊 暂无调查数据</h3>
+                            <p>还没有用户提交调查问卷。</p>
+                            <p>数据将在用户提交OSDI调查后显示在这里。</p>
                             <div style="margin-top: 20px;">
                                 <a href="index.html" style="
                                     background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
@@ -235,15 +213,31 @@
                                     padding: 10px 20px;
                                     border-radius: 8px;
                                     font-weight: 500;
-                                ">Go to Survey</a>
+                                ">前往调查</a>
                             </div>
                         </div>
                     `;
+                } else {
+                    displayData(formattedData);
+                    console.log(`成功显示 ${formattedData.length} 条记录`);
                 }
                 
             } catch (error) {
-                console.error('Error loading data:', error);
-                container.innerHTML = '<div class="error">Error loading data: ' + error.message + '</div>';
+                console.error('加载数据时出错:', error);
+                container.innerHTML = `
+                    <div class="error">
+                        加载数据时出错: ${error.message}
+                        <br><br>
+                        <button onclick="loadAllData()" style="
+                            background: #D01F3E;
+                            color: white;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 5px;
+                            cursor: pointer;
+                        ">重试</button>
+                    </div>
+                `;
             }
         }
 
