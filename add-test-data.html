@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>添加测试数据</title>
+    <title>Add Test Data</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -51,14 +51,14 @@
 </head>
 <body>
     <div class="container">
-        <h1>📊 添加测试数据</h1>
-        <p>数据库被重置了，让我们添加一些测试数据：</p>
+        <h1>📊 Add Test Data</h1>
+        <p>The database has been reset, let's add some test data:</p>
         
         <div>
-            <button class="test-button" onclick="addTestData1()">添加测试数据1</button>
-            <button class="test-button" onclick="addTestData2()">添加测试数据2</button>
-            <button class="test-button" onclick="addTestData3()">添加测试数据3</button>
-            <button class="test-button" onclick="checkData()">检查数据</button>
+            <button class="test-button" onclick="addTestData1()">Add Test Data 1</button>
+            <button class="test-button" onclick="addTestData2()">Add Test Data 2</button>
+            <button class="test-button" onclick="addTestData3()">Add Test Data 3</button>
+            <button class="test-button" onclick="checkData()">Check Data</button>
         </div>
         
         <div id="results"></div>
@@ -93,7 +93,7 @@
                 watchingTV: 1
             };
             
-            await submitData(testData, '测试数据1');
+            await submitData(testData, 'Test Data 1');
         }
 
         async function addTestData2() {
@@ -113,7 +113,7 @@
                 watchingTV: 0
             };
             
-            await submitData(testData, '测试数据2');
+            await submitData(testData, 'Test Data 2');
         }
 
         async function addTestData3() {
@@ -133,12 +133,12 @@
                 watchingTV: 3
             };
             
-            await submitData(testData, '测试数据3');
+            await submitData(testData, 'Test Data 3');
         }
 
         async function submitData(data, name) {
             try {
-                log(`开始提交${name}...`);
+                log(`Starting to submit ${name}...`);
                 
                 const response = await fetch('/api/survey/submit', {
                     method: 'POST',
@@ -151,33 +151,33 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    log(`✅ ${name}提交成功: ${JSON.stringify(result, null, 2)}`, 'success');
+                    log(`✅ ${name} submitted successfully: ${JSON.stringify(result, null, 2)}`, 'success');
                 } else {
-                    log(`❌ ${name}提交失败: ${JSON.stringify(result, null, 2)}`, 'error');
+                    log(`❌ ${name} submission failed: ${JSON.stringify(result, null, 2)}`, 'error');
                 }
             } catch (error) {
-                log(`❌ ${name}提交错误: ${error.message}`, 'error');
+                log(`❌ ${name} submission error: ${error.message}`, 'error');
             }
         }
 
         async function checkData() {
             try {
-                log('检查当前数据...');
+                log('Checking current data...');
                 
                 const response = await fetch('/api/survey/recent/10');
                 const data = await response.json();
                 
-                log(`当前数据条数: ${data.length}`);
-                log(`数据内容: ${JSON.stringify(data, null, 2)}`);
+                log(`Current data count: ${data.length}`);
+                log(`Data content: ${JSON.stringify(data, null, 2)}`);
                 
             } catch (error) {
-                log(`检查数据错误: ${error.message}`, 'error');
+                log(`Check data error: ${error.message}`, 'error');
             }
         }
 
         // 页面加载时检查数据
         window.onload = function() {
-            log('页面加载完成，检查当前数据状态...');
+            log('Page loaded, checking current data status...');
             checkData();
         };
     </script>

@@ -172,21 +172,21 @@
             container.innerHTML = '<div class="loading">Loading data...</div>';
             
             try {
-                console.log('开始加载数据...');
+                console.log('Loading data...');
                 
                 // Try to load from server first
                 const response = await fetch('/api/survey/recent/100');
-                console.log('API响应状态:', response.status);
+                console.log('API response status:', response.status);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const serverData = await response.json();
-                console.log('服务器返回数据:', serverData);
+                console.log('Server response data:', serverData);
                 
                 if (!Array.isArray(serverData)) {
-                    throw new Error('服务器返回的数据不是数组格式');
+                    throw new Error('Server returned data is not in array format');
                 }
                 
                 // Format server data
@@ -196,15 +196,15 @@
                     overall_osdi: item.overall_osdi || 0
                 }));
                 
-                console.log('格式化后的数据:', formattedData);
+                console.log('Formatted data:', formattedData);
                 
                 // Display data
                 if (formattedData.length === 0) {
                     container.innerHTML = `
                         <div style="text-align: center; padding: 40px; color: #666;">
-                            <h3>📊 暂无调查数据</h3>
-                            <p>还没有用户提交调查问卷。</p>
-                            <p>数据将在用户提交OSDI调查后显示在这里。</p>
+                            <h3>📊 No Survey Data Found</h3>
+                            <p>No users have submitted survey questionnaires yet.</p>
+                            <p>Data will be displayed here after users submit the OSDI survey.</p>
                             <div style="margin-top: 20px;">
                                 <a href="index.html" style="
                                     background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
@@ -213,20 +213,20 @@
                                     padding: 10px 20px;
                                     border-radius: 8px;
                                     font-weight: 500;
-                                ">前往调查</a>
+                                ">Go to Survey</a>
                             </div>
                         </div>
                     `;
                 } else {
                     displayData(formattedData);
-                    console.log(`成功显示 ${formattedData.length} 条记录`);
+                    console.log(`Successfully displayed ${formattedData.length} records`);
                 }
                 
             } catch (error) {
-                console.error('加载数据时出错:', error);
+                console.error('Error loading data:', error);
                 container.innerHTML = `
                     <div class="error">
-                        加载数据时出错: ${error.message}
+                        Error loading data: ${error.message}
                         <br><br>
                         <button onclick="loadAllData()" style="
                             background: #D01F3E;
@@ -235,7 +235,7 @@
                             padding: 10px 20px;
                             border-radius: 5px;
                             cursor: pointer;
-                        ">重试</button>
+                        ">Retry</button>
                     </div>
                 `;
             }

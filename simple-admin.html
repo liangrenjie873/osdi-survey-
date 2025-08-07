@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>简化管理界面</title>
+    <title>Simple Admin Interface</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -53,12 +53,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔧 简化管理界面</h1>
+        <h1>🔧 Simple Admin Interface</h1>
         
         <div>
-            <button class="test-button" onclick="testAPI()">测试API</button>
-            <button class="test-button" onclick="loadData()">加载数据</button>
-            <button class="test-button" onclick="clearResults()">清空结果</button>
+            <button class="test-button" onclick="testAPI()">Test API</button>
+            <button class="test-button" onclick="loadData()">Load Data</button>
+            <button class="test-button" onclick="clearResults()">Clear Results</button>
         </div>
         
         <div id="results"></div>
@@ -68,7 +68,7 @@
     <script>
         async function testAPI() {
             const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<div class="result">测试中...</div>';
+            resultsDiv.innerHTML = '<div class="result">Testing...</div>';
             
             try {
                 const response = await fetch('/api/survey/recent/10');
@@ -76,23 +76,23 @@
                 
                 resultsDiv.innerHTML = `
                     <div class="result">
-                        <strong>API测试结果:</strong>
-                        状态码: ${response.status}
-                        数据条数: ${Array.isArray(data) ? data.length : '未知'}
-                        数据: ${JSON.stringify(data, null, 2)}
+                        <strong>API Test Results:</strong>
+                        Status Code: ${response.status}
+                        Data Count: ${Array.isArray(data) ? data.length : 'Unknown'}
+                        Data: ${JSON.stringify(data, null, 2)}
                     </div>
                 `;
             } catch (error) {
-                resultsDiv.innerHTML = `<div class="result">错误: ${error.message}</div>`;
+                resultsDiv.innerHTML = `<div class="result">Error: ${error.message}</div>`;
             }
         }
 
         async function loadData() {
             const tableContainer = document.getElementById('tableContainer');
-            tableContainer.innerHTML = '<div class="result">加载中...</div>';
+            tableContainer.innerHTML = '<div class="result">Loading...</div>';
             
             try {
-                console.log('开始加载数据...');
+                console.log('Loading data...');
                 const response = await fetch('/api/survey/recent/100');
                 
                 if (!response.ok) {
@@ -100,25 +100,25 @@
                 }
                 
                 const data = await response.json();
-                console.log('服务器返回数据:', data);
+                console.log('Server response data:', data);
                 
                 if (!Array.isArray(data)) {
-                    throw new Error('服务器返回的数据不是数组格式');
+                    throw new Error('Server returned data is not in array format');
                 }
                 
                 if (data.length === 0) {
-                    tableContainer.innerHTML = '<div class="result">没有找到调查数据</div>';
+                    tableContainer.innerHTML = '<div class="result">No survey data found</div>';
                     return;
                 }
                 
-                // 创建表格
-                let html = '<table><thead><tr><th>ID</th><th>姓名</th><th>提交时间</th><th>OSDI分数</th><th>评级</th></tr></thead><tbody>';
+                // Create table
+                let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Submission Time</th><th>OSDI Score</th><th>Rating</th></tr></thead><tbody>';
                 
                 data.forEach(item => {
                     const name = item.participant_name || 'Anonymous';
                     const date = new Date(item.submission_time).toLocaleString('zh-CN');
                     const score = item.overall_osdi || 0;
-                    const rating = item.overall_rating || '未知';
+                    const rating = item.overall_rating || 'Unknown';
                     
                     html += `<tr>
                         <td>${item.id}</td>
@@ -132,11 +132,11 @@
                 html += '</tbody></table>';
                 tableContainer.innerHTML = html;
                 
-                console.log(`成功显示 ${data.length} 条记录`);
+                console.log(`Successfully displayed ${data.length} records`);
                 
             } catch (error) {
-                console.error('加载数据时出错:', error);
-                tableContainer.innerHTML = `<div class="result">错误: ${error.message}</div>`;
+                console.error('Error loading data:', error);
+                tableContainer.innerHTML = `<div class="result">Error: ${error.message}</div>`;
             }
         }
 

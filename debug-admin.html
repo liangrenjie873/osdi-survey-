@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>调试管理界面</title>
+    <title>Debug Admin Interface</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,9 +58,9 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔧 调试管理界面</h1>
+        <h1>🔧 Debug Admin Interface</h1>
         
-        <div id="debugInfo" class="debug-info">正在初始化...</div>
+        <div id="debugInfo" class="debug-info">Initializing...</div>
         
         <div id="tableContainer">
             <div class="loading">Loading data...</div>
@@ -85,41 +85,41 @@
             const tableContainer = document.getElementById('tableContainer');
             
             try {
-                log('开始加载数据...');
-                tableContainer.innerHTML = '<div class="loading">正在加载数据...</div>';
+                log('Loading data...');
+                tableContainer.innerHTML = '<div class="loading">Loading data...</div>';
                 
-                log('发送API请求到 /api/survey/recent/100');
+                log('Sending API request to /api/survey/recent/100');
                 const response = await fetch('/api/survey/recent/100');
                 
-                log(`API响应状态: ${response.status}`);
-                log(`API响应头: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
+                log(`API response status: ${response.status}`);
+                log(`API response headers: ${JSON.stringify(Object.fromEntries(response.headers.entries()))}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                log('解析JSON响应...');
+                log('Parsing JSON response...');
                 const data = await response.json();
-                log(`解析完成，数据类型: ${typeof data}, 是否为数组: ${Array.isArray(data)}`);
+                log(`Parsing complete, data type: ${typeof data}, is array: ${Array.isArray(data)}`);
                 
                 if (!Array.isArray(data)) {
                     throw new Error(`服务器返回的数据不是数组格式: ${typeof data}`);
                 }
                 
-                log(`数据条数: ${data.length}`);
-                log(`原始数据: ${JSON.stringify(data, null, 2)}`);
+                log(`Data count: ${data.length}`);
+                log(`Raw data: ${JSON.stringify(data, null, 2)}`);
                 
                 if (data.length === 0) {
-                    tableContainer.innerHTML = '<div class="debug-info success">没有找到调查数据</div>';
+                    tableContainer.innerHTML = '<div class="debug-info success">No survey data found</div>';
                     return;
                 }
                 
-                // 创建表格
-                log('创建数据表格...');
-                let html = '<table><thead><tr><th>ID</th><th>姓名</th><th>提交时间</th><th>OSDI分数</th><th>评级</th></tr></thead><tbody>';
+                // Create table
+                log('Creating data table...');
+                let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Submission Time</th><th>OSDI Score</th><th>Rating</th></tr></thead><tbody>';
                 
                 data.forEach((item, index) => {
-                    log(`处理第 ${index + 1} 条数据: ${JSON.stringify(item)}`);
+                    log(`Processing record ${index + 1}: ${JSON.stringify(item)}`);
                     
                     const name = item.participant_name || 'Anonymous';
                     const date = new Date(item.submission_time).toLocaleString('zh-CN');
@@ -138,15 +138,15 @@
                 html += '</tbody></table>';
                 tableContainer.innerHTML = html;
                 
-                log(`成功显示 ${data.length} 条记录`, 'success');
+                log(`Successfully displayed ${data.length} records`, 'success');
                 
             } catch (error) {
-                log(`错误: ${error.message}`, 'error');
-                log(`错误堆栈: ${error.stack}`, 'error');
+                log(`Error: ${error.message}`, 'error');
+                log(`Error stack: ${error.stack}`, 'error');
                 
                 tableContainer.innerHTML = `
                     <div class="debug-info error">
-                        加载数据时出错: ${error.message}
+                        Error loading data: ${error.message}
                         <br><br>
                         <button onclick="loadData()" style="
                             background: #f44336;
@@ -155,7 +155,7 @@
                             padding: 10px 20px;
                             border-radius: 5px;
                             cursor: pointer;
-                        ">重试</button>
+                        ">Retry</button>
                     </div>
                 `;
             }
@@ -163,18 +163,18 @@
 
         // 页面加载时自动开始
         document.addEventListener('DOMContentLoaded', function() {
-            log('页面加载完成，开始调试...');
+            log('Page loaded, starting debug...');
             loadData();
         });
         
         // 备用方案
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
-                log('DOMContentLoaded触发，开始调试...');
+                log('DOMContentLoaded triggered, starting debug...');
                 loadData();
             });
         } else {
-            log('页面已加载，直接开始调试...');
+            log('Page already loaded, starting debug directly...');
             loadData();
         }
     </script>
