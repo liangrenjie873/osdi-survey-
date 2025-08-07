@@ -10,7 +10,7 @@
     <div class="container">
         <header>
             <!-- KOUSHICARE Logo -->
-            <div class="header-logo" onclick="openAdminPanel()" title="Click to access admin panel" style="cursor: pointer;">
+            <div class="header-logo" onclick="adminAccess()" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Click to access admin panel" style="cursor: pointer; transition: opacity 0.3s;">
                 <img src="images/koushicare-logo.png" alt="KOUSHICARE" class="main-logo">
                 <!-- Hidden admin link for backup -->
                 <a href="admin.html" id="adminLink" style="display: none;" target="_blank">Admin</a>
@@ -382,40 +382,33 @@
 
     <script src="script.js"></script>
     <script>
-        // 确保openAdminPanel函数可用
-        function openAdminPanel() {
-            try {
-                console.log('openAdminPanel function called');
-                
-                // Request password
-                const password = prompt('Enter admin password:');
-                
-                if (password === '123456') {
-                    // Correct password, redirect to unified admin panel
-                    console.log('Password correct, redirecting to admin panel...');
-                    window.location.href = 'admin.html';
-                } else if (password !== null) {
-                    // Wrong password (null means user cancelled)
-                    alert('Incorrect password!');
-                }
-            } catch (error) {
-                console.error('Error opening admin panel:', error);
-                // Fallback: try direct navigation
+        // 管理员访问函数 - 简化版本
+        function adminAccess() {
+            console.log('Admin access function called');
+            
+            // Request password
+            var password = prompt('Enter admin password:');
+            
+            if (password === '123456') {
+                // Correct password, redirect to admin panel
+                console.log('Password correct, redirecting...');
+                alert('Access granted! Redirecting to admin panel...');
                 window.location.href = 'admin.html';
+            } else if (password !== null) {
+                // Wrong password (null means user cancelled)
+                alert('Incorrect password!');
             }
         }
         
-        // 确保页面加载完成后函数可用
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, openAdminPanel function is available');
-            
-            // 为logo添加点击事件
-            const logo = document.querySelector('.header-logo');
-            if (logo) {
-                logo.onclick = openAdminPanel;
-                console.log('Logo click event added');
-            }
-        });
+        // 备用函数
+        function openAdminPanel() {
+            adminAccess();
+        }
+        
+        // 页面加载时测试函数
+        window.onload = function() {
+            console.log('Page loaded, admin access function is ready');
+        };
     </script>
 </body>
 </html>
