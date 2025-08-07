@@ -120,9 +120,11 @@ app.post('/api/survey/submit', async (req, res) => {
     console.log('=== Survey Submission Request ===');
     console.log('Client IP:', clientIP);
     console.log('User Agent:', userAgent);
-    console.log('Request Headers:', req.headers);
+    console.log('Participant Name:', data.participantName);
+    console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
     console.log('Request Body:', JSON.stringify(data, null, 2));
     console.log('Timestamp:', new Date().toISOString());
+    console.log('VPN Detection:', clientIP.includes('103.') || clientIP.includes('104.') || clientIP.includes('45.') ? 'Likely VPN' : 'Regular IP');
     console.log('================================');
     
     // Validate required fields

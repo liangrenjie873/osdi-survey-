@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Recovery Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        .warning {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Data Recovery Tool</h1>
+        <p>Check and recover missing survey data</p>
+        
+        <div>
+            <button class="test-button" onclick="checkCurrentData()">Check Current Data</button>
+            <button class="test-button" onclick="searchForData()">Search for "24K纯帅"</button>
+            <button class="test-button" onclick="addMissingData()">Add Missing Data</button>
+            <button class="test-button" onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <div id="results"></div>
+        <div id="tableContainer"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const resultsDiv = document.getElementById('results');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}\n`;
+            
+            resultsDiv.textContent += logEntry;
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+            
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        async function checkCurrentData() {
+            try {
+                log('Checking current database data...');
+                
+                const response = await fetch('/api/survey/recent/100');
+                const data = await response.json();
+                
+                log(`📊 Database contains ${data.length} surveys`, 'info');
+                
+                if (data.length === 0) {
+                    log('📭 Database is empty', 'warning');
+                    return;
+                }
+                
+                // Display data in table
+                let html = '<table><thead><tr><th>ID</th><th>Name</th><th>Submission Time</th><th>OSDI Score</th><th>Rating</th></tr></thead><tbody>';
+                
+                data.forEach((survey, index) => {
+                    const name = survey.participant_name || 'Anonymous';
+                    const date = new Date(survey.submission_time).toLocaleString('en-US');
+                    const score = survey.overall_osdi || 0;
+                    const rating = survey.overall_rating || 'Unknown';
+                    
+                    html += `<tr>
+                        <td>${survey.id || index + 1}</td>
+                        <td>${name}</td>
+                        <td>${date}</td>
+                        <td>${score}</td>
+                        <td>${rating}</td>
+                    </tr>`;
+                });
+                
+                html += '</tbody></table>';
+                document.getElementById('tableContainer').innerHTML = html;
+                
+                // Check for specific data
+                const targetData = data.find(survey => 
+                    survey.participant_name && 
+                    survey.participant_name.includes('24K纯帅')
+                );
+                
+                if (targetData) {
+                    log(`✅ Found "24K纯帅" data: ${JSON.stringify(targetData, null, 2)}`, 'success');
+                } else {
+                    log(`❌ "24K纯帅" data not found in database`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Error checking data: ${error.message}`, 'error');
+            }
+        }
+
+        async function searchForData() {
+            try {
+                log('Searching for "24K纯帅" data...');
+                
+                const response = await fetch('/api/survey/recent/1000');
+                const data = await response.json();
+                
+                const targetData = data.filter(survey => 
+                    survey.participant_name && 
+                    (survey.participant_name.includes('24K纯帅') || 
+                     survey.participant_name.includes('24K') ||
+                     survey.participant_name.includes('纯帅'))
+                );
+                
+                if (targetData.length > 0) {
+                    log(`✅ Found ${targetData.length} matching records:`, 'success');
+                    targetData.forEach((item, index) => {
+                        log(`Record ${index + 1}: ${item.participant_name} (OSDI: ${item.overall_osdi})`, 'success');
+                    });
+                } else {
+                    log(`❌ No data found for "24K纯帅"`, 'error');
+                    log('The data may have been lost during deployment or submission failed', 'warning');
+                }
+                
+            } catch (error) {
+                log(`❌ Error searching data: ${error.message}`, 'error');
+            }
+        }
+
+        async function addMissingData() {
+            try {
+                log('Adding missing "24K纯帅" data...');
+                
+                const testData = {
+                    participantName: '24K纯帅',
+                    windy1: 3,
+                    dry: 4,
+                    windy2: 2,
+                    photophobia: 3,
+                    sandFeeling: 2,
+                    painSwelling: 1,
+                    blurredVision: 3,
+                    decreasedVision: 2,
+                    reading: 4,
+                    nightDriving: 3,
+                    computerUse: 4,
+                    watchingTV: 2
+                };
+                
+                const response = await fetch('/api/survey/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    log(`✅ "24K纯帅" data added successfully!`, 'success');
+                    log(`Survey ID: ${result.surveyId}`, 'info');
+                    log(`OSDI Score: ${result.scores.overallOSDI}`, 'info');
+                } else {
+                    log(`❌ Failed to add data: ${result.message}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ Error adding data: ${error.message}`, 'error');
+            }
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+            document.getElementById('tableContainer').innerHTML = '';
+        }
+
+        // Auto-check on page load
+        window.onload = function() {
+            log('Data Recovery Tool Loaded');
+            log('Starting automatic data check...');
+            checkCurrentData();
+        };
+    </script>
+</body>
+</html> 
