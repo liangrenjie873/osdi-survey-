@@ -10,17 +10,35 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Security middleware
-app.use(helmet());
+// Security middleware with CSP configuration
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"],
+            styleSrc: ["'self'", "'unsafe-inline'"],
+            imgSrc: ["'self'", "data:", "https:"],
+            connectSrc: ["'self'"],
+            fontSrc: ["'self'"],
+            objectSrc: ["'none'"],
+            mediaSrc: ["'self'"],
+            frameSrc: ["'none'"],
+        },
+    },
+}));
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Rate limiting
+// Rate limiting - more permissive for testing
 const limiter = rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
-    message: 'Too many requests from this IP, please try again later.'
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 1000, // increased limit for testing
+    message: 'Too many requests from this IP, please try again later.',
+    skip: (req) => {
+        // Skip rate limiting for health checks and certain IPs
+        return req.path === '/api/health' || req.path === '/api/survey/recent';
+    }
 });
 app.use('/api/', limiter);
 
@@ -31,7 +49,7 @@ app.use(express.static(path.join(__dirname, '.')));
 let db;
 const connectToMongoDB = async () => {
     try {
-        const client = new MongoClient(process.env.MONGODB_URI);
+        const client = new MongoClient(process.env.MONGODB_URI || 'mongodb://localhost:27017');
         await client.connect();
         db = client.db('osdi-survey');
         console.log('Connected to MongoDB Atlas');
@@ -43,89 +61,119 @@ const connectToMongoDB = async () => {
         console.log('MongoDB indexes created');
     } catch (error) {
         console.error('MongoDB connection error:', error);
-        process.exit(1);
+        console.log('Falling back to local storage mode');
     }
 };
 
 // Initialize MongoDB connection
-if (process.env.DATABASE_TYPE === 'mongodb' && process.env.MONGODB_URI) {
-    connectToMongoDB();
-}
+connectToMongoDB();
 
-// Helper function to calculate scores
+// Helper function to calculate scores using OSDI formula
 function calculateScores(data) {
-    const environmentScore = (data.windy1 || 0) + (data.dry || 0) + (data.windy2 || 0);
-    const eyeDiscomfortScore = (data.photophobia || 0) + (data.sandFeeling || 0) + 
-                              (data.painSwelling || 0) + (data.blurredVision || 0) + 
-                              (data.decreasedVision || 0);
-    const dailyHabitsScore = (data.reading || 0) + (data.nightDriving || 0) + 
-                            (data.computerUse || 0) + (data.watchingTV || 0);
+    const environmentQuestions = ['windy1', 'dry', 'windy2'];
+    const eyeDiscomfortQuestions = ['photophobia', 'sandFeeling', 'painSwelling', 'blurredVision', 'decreasedVision'];
+    const dailyHabitsQuestions = ['reading', 'nightDriving', 'computerUse', 'watchingTV'];
+
+    const environmentScore = environmentQuestions.reduce((sum, q) => sum + (data[q] || 0), 0);
+    const eyeDiscomfortScore = eyeDiscomfortQuestions.reduce((sum, q) => sum + (data[q] || 0), 0);
+    const dailyHabitsScore = dailyHabitsQuestions.reduce((sum, q) => sum + (data[q] || 0), 0);
     
     const totalScore = environmentScore + eyeDiscomfortScore + dailyHabitsScore;
-    const totalQuestions = 12; // Total number of questions
+    const totalQuestions = environmentQuestions.length + eyeDiscomfortQuestions.length + dailyHabitsQuestions.length;
     
-    // Calculate OSDI scores
-    const environmentOsdi = (environmentScore * 25) / 3;
-    const eyeDiscomfortOsdi = (eyeDiscomfortScore * 25) / 5;
-    const dailyHabitsOsdi = (dailyHabitsScore * 25) / 4;
-    const overallOsdi = (totalScore * 25) / totalQuestions;
-    const overallPercentage = (overallOsdi / 100) * 100;
+    // Calculate OSDI scores using formula: (score × 25) / number of questions
+    const environmentOSDI = Math.round(((environmentScore * 25) / environmentQuestions.length) * 10) / 10;
+    const eyeDiscomfortOSDI = Math.round(((eyeDiscomfortScore * 25) / eyeDiscomfortQuestions.length) * 10) / 10;
+    const dailyHabitsOSDI = Math.round(((dailyHabitsScore * 25) / dailyHabitsQuestions.length) * 10) / 10;
+    const overallOSDI = Math.round(((totalScore * 25) / totalQuestions) * 10) / 10;
     
-    // Determine rating
+    // Determine rating based on OSDI score
     let overallRating;
-    if (overallOsdi <= 12) {
-        overallRating = 'Normal';
-    } else if (overallOsdi <= 22) {
-        overallRating = 'Mild Discomfort';
-    } else if (overallOsdi <= 32) {
-        overallRating = 'Moderate Discomfort';
-    } else {
-        overallRating = 'Severe Discomfort';
-    }
-    
+    if (overallOSDI >= 33) overallRating = 'Severe Discomfort';
+    else if (overallOSDI >= 23) overallRating = 'Moderate Discomfort';
+    else if (overallOSDI >= 13) overallRating = 'Mild Discomfort';
+    else overallRating = 'Normal/No Significant Discomfort';
+
     return {
-        environment_score: environmentScore,
-        eye_discomfort_score: eyeDiscomfortScore,
-        daily_habits_score: dailyHabitsScore,
-        total_score: totalScore,
-        environment_osdi: environmentOsdi,
-        eye_discomfort_osdi: eyeDiscomfortOsdi,
-        daily_habits_osdi: dailyHabitsOsdi,
-        overall_osdi: overallOsdi,
-        overall_percentage: overallPercentage,
-        overall_rating: overallRating
+        environmentScore,
+        eyeDiscomfortScore,
+        dailyHabitsScore,
+        totalScore,
+        environmentOSDI,
+        eyeDiscomfortOSDI,
+        dailyHabitsOSDI,
+        overallOSDI,
+        overallPercentage: overallOSDI,
+        overallRating
     };
 }
 
 // API Routes
+
+// Submit survey
 app.post('/api/survey/submit', async (req, res) => {
+    const data = req.body;
+    const clientIP = req.ip || req.connection.remoteAddress;
+    const userAgent = req.get('User-Agent');
+    
+    // Log detailed request information for debugging
+    console.log('=== Survey Submission Request ===');
+    console.log('Client IP:', clientIP);
+    console.log('User Agent:', userAgent);
+    console.log('Request Headers:', req.headers);
+    console.log('Request Body:', JSON.stringify(data, null, 2));
+    console.log('Timestamp:', new Date().toISOString());
+    console.log('================================');
+    
+    // Validate required fields
+    const requiredFields = [
+        'windy1', 'dry', 'windy2',
+        'photophobia', 'sandFeeling', 'painSwelling', 'blurredVision', 'decreasedVision',
+        'reading', 'nightDriving', 'computerUse', 'watchingTV'
+    ];
+    
+    const missingFields = requiredFields.filter(field => data[field] === undefined || data[field] === null);
+    if (missingFields.length > 0) {
+        return res.status(400).json({
+            success: false,
+            message: 'Missing required fields',
+            missingFields: missingFields
+        });
+    }
+
+    // Calculate scores
+    const scores = calculateScores(data);
+
     try {
-        const surveyData = req.body;
-        const scores = calculateScores(surveyData);
-        
         const surveyRecord = {
             submission_time: new Date(),
-            participant_name: surveyData.participant_name || 'Anonymous',
-            ip_address: req.ip || req.connection.remoteAddress,
-            user_agent: req.get('User-Agent'),
-            ...surveyData,
+            participant_name: data.participantName || 'Anonymous',
+            ip_address: clientIP,
+            user_agent: userAgent,
+            ...data,
             ...scores
         };
         
-        if (process.env.DATABASE_TYPE === 'mongodb' && db) {
-            // MongoDB
+        if (db) {
+            // Save to MongoDB
             const result = await db.collection('surveys').insertOne(surveyRecord);
             console.log('Survey saved to MongoDB:', result.insertedId);
+            
+            res.json({
+                success: true,
+                message: 'Survey submitted successfully',
+                surveyId: result.insertedId,
+                scores: scores
+            });
         } else {
-            // Fallback to local storage (for demo purposes)
+            // Fallback to local storage
             console.log('Survey data (local storage):', surveyRecord);
+            res.json({
+                success: true,
+                message: 'Survey submitted successfully (local mode)',
+                scores: scores
+            });
         }
-        
-        res.json({
-            success: true,
-            message: 'Survey submitted successfully',
-            scores: scores
-        });
     } catch (error) {
         console.error('Error submitting survey:', error);
         res.status(500).json({
@@ -135,114 +183,56 @@ app.post('/api/survey/submit', async (req, res) => {
     }
 });
 
-app.get('/api/survey/stats', async (req, res) => {
-    try {
-        if (process.env.DATABASE_TYPE === 'mongodb' && db) {
-            // MongoDB stats
-            const totalSurveys = await db.collection('surveys').countDocuments();
-            const avgScores = await db.collection('surveys').aggregate([
-                {
-                    $group: {
-                        _id: null,
-                        avgTotalScore: { $avg: '$total_score' },
-                        avgEnvironmentScore: { $avg: '$environment_score' },
-                        avgEyeDiscomfortScore: { $avg: '$eye_discomfort_score' },
-                        avgDailyHabitsScore: { $avg: '$daily_habits_score' },
-                        avgOverallOsdi: { $avg: '$overall_osdi' }
-                    }
-                }
-            ]).toArray();
-            
-            const ratingDistribution = await db.collection('surveys').aggregate([
-                {
-                    $group: {
-                        _id: '$overall_rating',
-                        count: { $sum: 1 }
-                    }
-                }
-            ]).toArray();
-            
-            res.json({
-                total_surveys: totalSurveys,
-                average_scores: avgScores[0] || {},
-                rating_distribution: ratingDistribution
-            });
-        } else {
-            // Fallback response
-            res.json({
-                total_surveys: 0,
-                average_scores: {},
-                rating_distribution: [],
-                message: 'Database not configured'
-            });
-        }
-    } catch (error) {
-        console.error('Error getting stats:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error retrieving statistics'
-        });
-    }
-});
-
+// Get recent submissions
 app.get('/api/survey/recent/:limit?', async (req, res) => {
+    const limit = parseInt(req.params.limit) || 10;
+    
     try {
-        const limit = parseInt(req.params.limit) || 10;
-        
-        if (process.env.DATABASE_TYPE === 'mongodb' && db) {
-            const recentSurveys = await db.collection('surveys')
+        if (db) {
+            // Get from MongoDB
+            const surveys = await db.collection('surveys')
                 .find({})
                 .sort({ submission_time: -1 })
                 .limit(limit)
                 .toArray();
             
-            res.json(recentSurveys);
+            res.json(surveys);
         } else {
+            // Fallback to empty array
             res.json([]);
         }
     } catch (error) {
-        console.error('Error getting recent surveys:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Error retrieving recent surveys'
-        });
+        console.error('Error fetching recent submissions:', error);
+        res.status(500).json({ success: false, message: 'Database error' });
     }
 });
 
-app.get('/api/survey/export', async (req, res) => {
+// Health check API
+app.get('/api/health', async (req, res) => {
     try {
-        if (process.env.DATABASE_TYPE === 'mongodb' && db) {
-            const allSurveys = await db.collection('surveys').find({}).toArray();
-            
-            res.setHeader('Content-Type', 'application/json');
-            res.setHeader('Content-Disposition', 'attachment; filename=surveys.json');
-            res.json(allSurveys);
-        } else {
-            res.json([]);
+        let totalSurveys = 0;
+        if (db) {
+            totalSurveys = await db.collection('surveys').countDocuments();
         }
+        
+        res.json({
+            status: 'ok',
+            message: 'Server is running',
+            database: db ? 'mongodb' : 'local',
+            total_surveys: totalSurveys,
+            timestamp: new Date().toISOString()
+        });
     } catch (error) {
-        console.error('Error exporting surveys:', error);
         res.status(500).json({
-            success: false,
-            message: 'Error exporting data'
+            status: 'error',
+            message: 'Database connection failed',
+            error: error.message
         });
     }
-});
-
-// Health check endpoint
-app.get('/api/health', (req, res) => {
-    res.json({
-        status: 'OK',
-        timestamp: new Date().toISOString(),
-        database: process.env.DATABASE_TYPE || 'sqlite'
-    });
 });
 
 // Start server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
-    console.log(`Database type: ${process.env.DATABASE_TYPE || 'sqlite'}`);
-    if (process.env.DATABASE_TYPE === 'mongodb') {
-        console.log('MongoDB Atlas enabled');
-    }
+    console.log(`Database: ${db ? 'MongoDB Atlas' : 'Local storage'}`);
 }); 

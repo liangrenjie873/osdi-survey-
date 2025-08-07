@@ -4,9 +4,10 @@
   "description": "A web-based survey for assessing glasses discomfort",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node server-cloud.js",
+    "start:local": "node server.js",
     "start:cloud": "node server-cloud.js",
-    "dev": "nodemon server.js",
+    "dev": "nodemon server-cloud.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
