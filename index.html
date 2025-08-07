@@ -10,13 +10,13 @@
     <div class="container">
         <header>
             <!-- KOUSHICARE Logo -->
-            <div class="header-logo" onclick="adminAccess()" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Click to access admin panel" style="cursor: pointer; transition: opacity 0.3s;">
+            <div class="header-logo" onclick="var pwd=prompt('Enter admin password:'); if(pwd==='123456'){alert('Access granted!'); window.location.href='admin.html';}else if(pwd!==null){alert('Incorrect password!');}" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'" title="Click to access admin panel" style="cursor: pointer; transition: opacity 0.3s;">
                 <img src="images/koushicare-logo.png" alt="KOUSHICARE" class="main-logo">
                 <!-- Hidden admin link for backup -->
                 <a href="admin.html" id="adminLink" style="display: none;" target="_blank">Admin</a>
             </div>
             
-            <h1 onclick="adminAccess()" style="cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='#D01F3E'" onmouseout="this.style.color=''" title="Click to access admin panel">OSDI TEST</h1>
+            <h1 onclick="var pwd=prompt('Enter admin password:'); if(pwd==='123456'){alert('Access granted!'); window.location.href='admin.html';}else if(pwd!==null){alert('Incorrect password!');}" style="cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='#D01F3E'" onmouseout="this.style.color=''" title="Click to access admin panel">OSDI TEST</h1>
             <p>Please select the option that best describes the frequency of your recent discomfort.</p>
         </header>
 
