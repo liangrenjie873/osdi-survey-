@@ -503,6 +503,53 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem(surveyKey, JSON.stringify(surveyResult));
         
         console.log('Survey saved to localStorage:', surveyKey, surveyResult);
+        
+        // Also try to save to server if API is available
+        submitToServer(surveyResult);
+    }
+    
+    // Submit survey data to server
+    async function submitToServer(surveyResult) {
+        try {
+            console.log('Attempting to submit to server...');
+            
+            // Prepare data for server API
+            const serverData = {
+                participantName: surveyResult.participantName || 'Anonymous',
+                windy1: surveyResult.data.windy1 || 0,
+                dry: surveyResult.data.dry || 0,
+                windy2: surveyResult.data.windy2 || 0,
+                photophobia: surveyResult.data.photophobia || 0,
+                sandFeeling: surveyResult.data.sandFeeling || 0,
+                painSwelling: surveyResult.data.painSwelling || 0,
+                blurredVision: surveyResult.data.blurredVision || 0,
+                decreasedVision: surveyResult.data.decreasedVision || 0,
+                reading: surveyResult.data.reading || 0,
+                nightDriving: surveyResult.data.nightDriving || 0,
+                computerUse: surveyResult.data.computerUse || 0,
+                watchingTV: surveyResult.data.watchingTV || 0,
+                timestamp: surveyResult.timestamp,
+                overall_osdi: surveyResult.overallOSDI
+            };
+            
+            // Try to submit to server API
+            const response = await fetch('/api/survey/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(serverData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                console.log('Survey successfully submitted to server:', result);
+            } else {
+                console.warn('Server submission failed, but data is saved locally');
+            }
+        } catch (error) {
+            console.warn('Could not submit to server (static deployment), data saved locally only:', error.message);
+        }
     }
     
     // Clear local storage

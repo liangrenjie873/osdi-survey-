@@ -174,10 +174,21 @@
             let allData = [];
 
             try {
-                // For Netlify deployment, only load from localStorage
-                console.log('Loading data from localStorage for static deployment...');
+                console.log('Loading data from server and localStorage...');
                 
-                // Load from localStorage (works for static sites like Netlify)
+                // Try to load from server first
+                try {
+                    const response = await fetch('/api/survey/recent/100');
+                    if (response.ok) {
+                        const serverData = await response.json();
+                        console.log('Loaded data from server:', serverData.length, 'records');
+                        allData = allData.concat(serverData);
+                    }
+                } catch (serverError) {
+                    console.log('Server not available, loading from localStorage only');
+                }
+                
+                // Also load from localStorage (for backward compatibility)
                 const localData = loadLocalData();
                 allData = allData.concat(localData);
 
