@@ -3,193 +3,277 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPN Connection Test</title>
+    <title>VPN Test - OSDI Survey</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background: #f5f5f5;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
         }
         .container {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
         }
-        .test-button {
-            background: #007bff;
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        button {
+            background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
+            padding: 12px 24px;
+            border-radius: 8px;
             cursor: pointer;
-            margin: 5px;
+            margin: 10px 5px;
+            font-size: 16px;
         }
-        .test-button:hover {
-            background: #0056b3;
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .result {
-            background: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.3);
             padding: 15px;
+            border-radius: 8px;
             margin: 10px 0;
-            font-family: monospace;
             white-space: pre-wrap;
+            font-family: monospace;
         }
-        .success {
-            border-color: #28a745;
-            background: #d4edda;
-        }
-        .error {
-            border-color: #dc3545;
-            background: #f8d7da;
-        }
-        .info {
-            border-color: #17a2b8;
-            background: #d1ecf1;
-        }
+        .success { border-left: 4px solid #4CAF50; }
+        .error { border-left: 4px solid #f44336; }
+        .info { border-left: 4px solid #2196F3; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🔍 VPN Connection Test</h1>
-        <p>This page helps diagnose VPN connection issues with the survey system.</p>
-        
-        <div>
-            <button class="test-button" onclick="testConnection()">Test Connection</button>
-            <button class="test-button" onclick="testIPInfo()">Check IP Info</button>
-            <button class="test-button" onclick="submitTestSurvey()">Submit Test Survey</button>
-            <button class="test-button" onclick="checkDatabase()">Check Database</button>
+        <h1>🔍 VPN 连接测试工具</h1>
+        <p>这个工具可以帮助诊断VPN提交数据的问题</p>
+
+        <div class="test-section">
+            <h3>1. 网络连接测试</h3>
+            <button onclick="testConnection()">测试网络连接</button>
+            <div id="connectionResult" class="result"></div>
         </div>
-        
-        <div id="results"></div>
+
+        <div class="test-section">
+            <h3>2. API 健康检查</h3>
+            <button onclick="testHealth()">检查API状态</button>
+            <div id="healthResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. 提交测试数据</h3>
+            <button onclick="submitTestData()">提交测试数据 (24K纯帅)</button>
+            <div id="submitResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. 查看最新数据</h3>
+            <button onclick="checkRecentData()">查看最新10条数据</button>
+            <div id="recentResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>5. 完整诊断</h3>
+            <button onclick="runFullDiagnostic()">运行完整诊断</button>
+            <div id="diagnosticResult" class="result"></div>
+        </div>
     </div>
 
     <script>
-        function log(message, type = 'info') {
-            const resultsDiv = document.getElementById('results');
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = `[${timestamp}] ${message}\n`;
-            
-            resultsDiv.textContent += logEntry;
-            resultsDiv.scrollTop = resultsDiv.scrollHeight;
-            
-            console.log(`[${type.toUpperCase()}] ${message}`);
-        }
+        const BASE_URL = window.location.origin;
 
         async function testConnection() {
+            const resultDiv = document.getElementById('connectionResult');
+            resultDiv.innerHTML = '正在测试连接...';
+            resultDiv.className = 'result info';
+
             try {
-                log('Testing basic connection...');
-                
-                const response = await fetch('/api/health');
+                const response = await fetch(`${BASE_URL}/api/health`);
                 const data = await response.json();
                 
-                if (response.ok) {
-                    log(`✅ Connection successful! Server status: ${data.status}`, 'success');
-                    log(`Database surveys: ${data.total_surveys}`, 'info');
-                } else {
-                    log(`❌ Connection failed: ${response.status}`, 'error');
-                }
+                resultDiv.innerHTML = `✅ 连接成功!\n\n状态: ${data.status}\n时间: ${data.timestamp}\n数据库: ${data.database}\n总数据量: ${data.total_surveys || 'N/A'}`;
+                resultDiv.className = 'result success';
             } catch (error) {
-                log(`❌ Connection error: ${error.message}`, 'error');
+                resultDiv.innerHTML = `❌ 连接失败!\n\n错误: ${error.message}`;
+                resultDiv.className = 'result error';
             }
         }
 
-        async function testIPInfo() {
+        async function testHealth() {
+            const resultDiv = document.getElementById('healthResult');
+            resultDiv.innerHTML = '正在检查API状态...';
+            resultDiv.className = 'result info';
+
             try {
-                log('Checking IP information...');
+                const response = await fetch(`${BASE_URL}/api/health`);
+                const data = await response.json();
                 
-                // Try to get IP info from external service
-                const ipResponse = await fetch('https://api.ipify.org?format=json');
-                const ipData = await ipResponse.json();
-                
-                log(`🌐 Your public IP: ${ipData.ip}`, 'info');
-                
-                // Check if IP is from VPN/common ranges
-                const ip = ipData.ip;
-                if (ip.startsWith('103.') || ip.startsWith('104.') || ip.startsWith('45.')) {
-                    log('⚠️  IP appears to be from a VPN/Proxy service', 'error');
-                } else {
-                    log('✅ IP appears to be a regular connection', 'success');
-                }
-                
+                resultDiv.innerHTML = `✅ API状态正常!\n\n详细信息:\n${JSON.stringify(data, null, 2)}`;
+                resultDiv.className = 'result success';
             } catch (error) {
-                log(`❌ IP check error: ${error.message}`, 'error');
+                resultDiv.innerHTML = `❌ API检查失败!\n\n错误: ${error.message}`;
+                resultDiv.className = 'result error';
             }
         }
 
-        async function submitTestSurvey() {
+        async function submitTestData() {
+            const resultDiv = document.getElementById('submitResult');
+            resultDiv.innerHTML = '正在提交测试数据...';
+            resultDiv.className = 'result info';
+
+            const testData = {
+                participantName: '24K纯帅',
+                windy1: 3,
+                dry: 2,
+                windy2: 1,
+                photophobia: 2,
+                sandFeeling: 3,
+                painSwelling: 1,
+                blurredVision: 2,
+                decreasedVision: 1,
+                reading: 2,
+                nightDriving: 3,
+                computerUse: 2,
+                watchingTV: 1
+            };
+
             try {
-                log('Submitting test survey via VPN...');
-                
-                const testData = {
-                    participantName: 'VPN_Test_' + Date.now(),
-                    windy1: 2,
-                    dry: 3,
-                    windy2: 1,
-                    photophobia: 2,
-                    sandFeeling: 1,
-                    painSwelling: 0,
-                    blurredVision: 2,
-                    decreasedVision: 1,
-                    reading: 3,
-                    nightDriving: 2,
-                    computerUse: 4,
-                    watchingTV: 1
-                };
-                
-                const response = await fetch('/api/survey/submit', {
+                const response = await fetch(`${BASE_URL}/api/survey/submit`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'
+                        'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(testData)
                 });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    log(`✅ Survey submitted successfully!`, 'success');
-                    log(`Survey ID: ${result.surveyId}`, 'info');
-                    log(`OSDI Score: ${result.scores.overallOSDI}`, 'info');
-                } else {
-                    log(`❌ Survey submission failed: ${result.message}`, 'error');
-                }
-                
-            } catch (error) {
-                log(`❌ Survey submission error: ${error.message}`, 'error');
-            }
-        }
 
-        async function checkDatabase() {
-            try {
-                log('Checking database content...');
-                
-                const response = await fetch('/api/survey/recent/10');
                 const data = await response.json();
                 
-                log(`📊 Database contains ${data.length} surveys`, 'info');
-                
-                if (data.length > 0) {
-                    data.forEach((survey, index) => {
-                        log(`Survey ${index + 1}: ${survey.participant_name} (OSDI: ${survey.overall_osdi})`, 'info');
-                    });
+                if (data.success) {
+                    resultDiv.innerHTML = `✅ 测试数据提交成功!\n\n参与者: ${testData.participantName}\nID: ${data.surveyId}\n分数: ${JSON.stringify(data.scores, null, 2)}`;
+                    resultDiv.className = 'result success';
                 } else {
-                    log('📭 Database is empty', 'error');
+                    resultDiv.innerHTML = `❌ 提交失败!\n\n错误: ${data.message}`;
+                    resultDiv.className = 'result error';
                 }
-                
             } catch (error) {
-                log(`❌ Database check error: ${error.message}`, 'error');
+                resultDiv.innerHTML = `❌ 提交错误!\n\n错误: ${error.message}`;
+                resultDiv.className = 'result error';
             }
         }
 
-        // Auto-run connection test on page load
+        async function checkRecentData() {
+            const resultDiv = document.getElementById('recentResult');
+            resultDiv.innerHTML = '正在获取最新数据...';
+            resultDiv.className = 'result info';
+
+            try {
+                const response = await fetch(`${BASE_URL}/api/survey/recent/10`);
+                const data = await response.json();
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    const formattedData = data.map(item => 
+                        `姓名: ${item.participant_name}\n时间: ${new Date(item.submission_time).toLocaleString()}\nIP: ${item.ip_address}\nOSDI: ${item.overall_osdi}`
+                    ).join('\n\n');
+                    
+                    resultDiv.innerHTML = `✅ 找到 ${data.length} 条数据:\n\n${formattedData}`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = '📭 暂无数据';
+                    resultDiv.className = 'result info';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `❌ 获取数据失败!\n\n错误: ${error.message}`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function runFullDiagnostic() {
+            const resultDiv = document.getElementById('diagnosticResult');
+            resultDiv.innerHTML = '正在运行完整诊断...\n\n';
+            resultDiv.className = 'result info';
+
+            let diagnosticLog = '=== VPN 诊断报告 ===\n\n';
+
+            // 1. 测试连接
+            try {
+                const healthResponse = await fetch(`${BASE_URL}/api/health`);
+                const healthData = await healthResponse.json();
+                diagnosticLog += `✅ 连接状态: 正常\n`;
+                diagnosticLog += `📊 数据库状态: ${healthData.database}\n`;
+                diagnosticLog += `📈 总数据量: ${healthData.total_surveys || 'N/A'}\n\n`;
+            } catch (error) {
+                diagnosticLog += `❌ 连接失败: ${error.message}\n\n`;
+            }
+
+            // 2. 提交测试数据
+            const testData = {
+                participantName: '24K纯帅_VPN测试',
+                windy1: 3, dry: 2, windy2: 1,
+                photophobia: 2, sandFeeling: 3, painSwelling: 1,
+                blurredVision: 2, decreasedVision: 1,
+                reading: 2, nightDriving: 3, computerUse: 2, watchingTV: 1
+            };
+
+            try {
+                const submitResponse = await fetch(`${BASE_URL}/api/survey/submit`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(testData)
+                });
+                const submitData = await submitResponse.json();
+                
+                if (submitData.success) {
+                    diagnosticLog += `✅ 测试数据提交: 成功\n`;
+                    diagnosticLog += `🆔 数据ID: ${submitData.surveyId}\n\n`;
+                } else {
+                    diagnosticLog += `❌ 测试数据提交: 失败 - ${submitData.message}\n\n`;
+                }
+            } catch (error) {
+                diagnosticLog += `❌ 提交错误: ${error.message}\n\n`;
+            }
+
+            // 3. 检查数据是否可见
+            try {
+                const recentResponse = await fetch(`${BASE_URL}/api/survey/recent/5`);
+                const recentData = await recentResponse.json();
+                
+                const testEntry = recentData.find(item => 
+                    item.participant_name === '24K纯帅_VPN测试'
+                );
+                
+                if (testEntry) {
+                    diagnosticLog += `✅ 数据可见性: 正常\n`;
+                    diagnosticLog += `📝 找到测试数据: ${testEntry.participant_name}\n`;
+                    diagnosticLog += `🌐 IP地址: ${testEntry.ip_address}\n`;
+                    diagnosticLog += `⏰ 提交时间: ${new Date(testEntry.submission_time).toLocaleString()}\n\n`;
+                } else {
+                    diagnosticLog += `⚠️ 数据可见性: 异常\n`;
+                    diagnosticLog += `❓ 未找到刚提交的测试数据\n`;
+                    diagnosticLog += `📊 当前数据库中有 ${recentData.length} 条记录\n\n`;
+                }
+            } catch (error) {
+                diagnosticLog += `❌ 数据检查失败: ${error.message}\n\n`;
+            }
+
+            diagnosticLog += `=== 诊断完成 ===\n`;
+            diagnosticLog += `💡 建议: 如果数据提交成功但不可见，可能是数据库同步问题`;
+
+            resultDiv.innerHTML = diagnosticLog;
+            resultDiv.className = 'result info';
+        }
+
+        // 页面加载时自动运行连接测试
         window.onload = function() {
-            log('VPN Test Page Loaded');
-            log('Starting automatic connection test...');
             testConnection();
         };
     </script>
