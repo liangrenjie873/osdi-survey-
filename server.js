@@ -301,10 +301,8 @@ app.get('/api/survey/recent/:limit?', (req, res) => {
             return res.status(500).json({ success: false, message: 'Database error' });
         }
 
-        res.json({
-            success: true,
-            submissions: rows
-        });
+        // Return data directly as array for admin.html compatibility
+        res.json(rows);
     });
 });
 
@@ -368,6 +366,27 @@ app.get('/admin', (req, res) => {
 // Serve remote admin page
 app.get('/remote-admin', (req, res) => {
     res.sendFile(path.join(__dirname, 'remote-admin.html'));
+});
+
+// Health check API
+app.get('/api/health', (req, res) => {
+    db.get('SELECT COUNT(*) as count FROM surveys', (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                status: 'error',
+                message: 'Database connection failed',
+                error: err.message
+            });
+        }
+        
+        res.json({
+            status: 'ok',
+            message: 'Server is running',
+            database: 'connected',
+            total_surveys: result.count,
+            timestamp: new Date().toISOString()
+        });
+    });
 });
 
 // Export all survey data (for remote sync)

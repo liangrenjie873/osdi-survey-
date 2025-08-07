@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API 测试页面</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        .error {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 API 测试页面</h1>
+    <p>这个页面用于测试服务器API是否正常工作</p>
+
+    <div class="test-section">
+        <h2>1. 健康检查</h2>
+        <button class="test-button" onclick="testHealth()">测试 /api/health</button>
+        <div id="healthResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. 获取调查数据</h2>
+        <button class="test-button" onclick="testRecentData()">测试 /api/survey/recent/10</button>
+        <div id="recentResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. 提交测试数据</h2>
+        <button class="test-button" onclick="submitTestData()">提交测试调查</button>
+        <div id="submitResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. 获取统计数据</h2>
+        <button class="test-button" onclick="testStats()">测试 /api/survey/stats</button>
+        <div id="statsResult"></div>
+    </div>
+
+    <script>
+        async function testHealth() {
+            const resultDiv = document.getElementById('healthResult');
+            resultDiv.innerHTML = '测试中...';
+            
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.innerHTML = `状态码: ${response.status}\n响应数据:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `错误: ${error.message}`;
+            }
+        }
+
+        async function testRecentData() {
+            const resultDiv = document.getElementById('recentResult');
+            resultDiv.innerHTML = '测试中...';
+            
+            try {
+                const response = await fetch('/api/survey/recent/10');
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.innerHTML = `状态码: ${response.status}\n数据条数: ${Array.isArray(data) ? data.length : '未知'}\n响应数据:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `错误: ${error.message}`;
+            }
+        }
+
+        async function submitTestData() {
+            const resultDiv = document.getElementById('submitResult');
+            resultDiv.innerHTML = '提交中...';
+            
+            const testData = {
+                participantName: '测试用户_' + Date.now(),
+                windy1: 2,
+                dry: 3,
+                windy2: 1,
+                photophobia: 2,
+                sandFeeling: 1,
+                painSwelling: 0,
+                blurredVision: 2,
+                decreasedVision: 1,
+                reading: 3,
+                nightDriving: 2,
+                computerUse: 4,
+                watchingTV: 1
+            };
+            
+            try {
+                const response = await fetch('/api/survey/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(testData)
+                });
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.innerHTML = `状态码: ${response.status}\n提交数据:\n${JSON.stringify(testData, null, 2)}\n\n响应数据:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `错误: ${error.message}`;
+            }
+        }
+
+        async function testStats() {
+            const resultDiv = document.getElementById('statsResult');
+            resultDiv.innerHTML = '测试中...';
+            
+            try {
+                const response = await fetch('/api/survey/stats');
+                const data = await response.json();
+                
+                resultDiv.className = 'result ' + (response.ok ? 'success' : 'error');
+                resultDiv.innerHTML = `状态码: ${response.status}\n响应数据:\n${JSON.stringify(data, null, 2)}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `错误: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -181,11 +181,31 @@
                     const response = await fetch('/api/survey/recent/100');
                     if (response.ok) {
                         const serverData = await response.json();
-                        console.log('Loaded data from server:', serverData.length, 'records');
-                        allData = allData.concat(serverData);
+                        console.log('Server response:', serverData);
+                        
+                        // Handle server data format
+                        if (Array.isArray(serverData)) {
+                            // Direct array format
+                            const formattedData = serverData.map(item => ({
+                                participant_name: item.participant_name || 'Anonymous',
+                                submission_time: item.submission_time,
+                                overall_osdi: item.overall_osdi || 0
+                            }));
+                            allData = allData.concat(formattedData);
+                            console.log('Loaded data from server:', formattedData.length, 'records');
+                        } else if (serverData.submissions) {
+                            // Wrapped format
+                            const formattedData = serverData.submissions.map(item => ({
+                                participant_name: item.participant_name || 'Anonymous',
+                                submission_time: item.submission_time,
+                                overall_osdi: item.overall_osdi || 0
+                            }));
+                            allData = allData.concat(formattedData);
+                            console.log('Loaded data from server:', formattedData.length, 'records');
+                        }
                     }
                 } catch (serverError) {
-                    console.log('Server not available, loading from localStorage only');
+                    console.log('Server not available, loading from localStorage only:', serverError);
                 }
                 
                 // Also load from localStorage (for backward compatibility)
