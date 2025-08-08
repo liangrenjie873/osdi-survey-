@@ -361,7 +361,14 @@
         // Format date for display - US timezone
         function formatDate(dateString) {
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
+            console.log('=== Date Format Debug ===');
+            console.log('Original dateString:', dateString);
+            console.log('Parsed date object:', date);
+            console.log('Date ISO string:', date.toISOString());
+            console.log('Date UTC string:', date.toUTCString());
+            console.log('Date local string:', date.toString());
+            
+            const formattedDate = date.toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'short',
                 day: 'numeric',
@@ -369,6 +376,11 @@
                 minute: '2-digit',
                 timeZone: 'America/New_York'
             });
+            
+            console.log('Formatted date (US Eastern):', formattedDate);
+            console.log('==========================');
+            
+            return formattedDate;
         }
 
         // Get CSS class for score color

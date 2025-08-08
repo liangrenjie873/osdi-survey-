@@ -147,8 +147,16 @@ app.post('/api/survey/submit', async (req, res) => {
     const scores = calculateScores(data);
 
     try {
+        const currentTime = new Date();
+        console.log('=== Time Debug Info ===');
+        console.log('Current server time:', currentTime);
+        console.log('Current server time (ISO):', currentTime.toISOString());
+        console.log('Current server time (local):', currentTime.toString());
+        console.log('Current server time (UTC):', currentTime.toUTCString());
+        console.log('========================');
+        
         const surveyRecord = {
-            submission_time: new Date(),
+            submission_time: currentTime,
             participant_name: data.participantName || 'Anonymous',
             ip_address: clientIP,
             user_agent: userAgent,
