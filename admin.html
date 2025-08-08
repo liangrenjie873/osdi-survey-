@@ -376,24 +376,24 @@
                 console.log('Date UTC string:', date.toUTCString());
                 console.log('Date local string:', date.toString());
                 
-                // 手动转换到纽约时间 (加7小时修正)
+                // 手动转换时间 (减3小时修正)
                 const utcTime = date.getTime();
-                const nyOffset = 7 * 60 * 60 * 1000; // 加7小时的毫秒数
-                const nyTime = new Date(utcTime + nyOffset);
+                const timeOffset = -3 * 60 * 60 * 1000; // 减3小时的毫秒数
+                const adjustedTime = new Date(utcTime + timeOffset);
                 
                 // 格式化显示
                 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                                'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 
-                const month = months[nyTime.getUTCMonth()];
-                const day = nyTime.getUTCDate();
-                const year = nyTime.getUTCFullYear();
-                const hour = nyTime.getUTCHours().toString().padStart(2, '0');
-                const minute = nyTime.getUTCMinutes().toString().padStart(2, '0');
+                const month = months[adjustedTime.getUTCMonth()];
+                const day = adjustedTime.getUTCDate();
+                const year = adjustedTime.getUTCFullYear();
+                const hour = adjustedTime.getUTCHours().toString().padStart(2, '0');
+                const minute = adjustedTime.getUTCMinutes().toString().padStart(2, '0');
                 
                 const formattedDate = `${month} ${day}, ${year}, ${hour}:${minute}`;
                 
-                console.log('Manual NY time conversion:', formattedDate);
+                console.log('Manual time conversion (minus 3 hours):', formattedDate);
                 console.log('==========================');
                 
                 return formattedDate;
