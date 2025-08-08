@@ -125,7 +125,7 @@ app.post('/api/survey/submit', async (req, res) => {
     console.log('Request Body:', JSON.stringify(data, null, 2));
     console.log('Timestamp:', (() => {
         const time = new Date();
-        time.setHours(time.getHours() - 3); // 减3小时显示
+        time.setHours(time.getHours() + 4); // 加4小时显示
         return time.toISOString();
     })());
     console.log('VPN Detection:', clientIP.includes('103.') || clientIP.includes('104.') || clientIP.includes('45.') ? 'Likely VPN' : 'Regular IP');
@@ -152,7 +152,7 @@ app.post('/api/survey/submit', async (req, res) => {
 
     try {
         const currentTime = new Date();
-        currentTime.setHours(currentTime.getHours() - 3); // 减3小时显示
+        currentTime.setHours(currentTime.getHours() + 4); // 加4小时显示
         
         // 确保时间是正确的
         console.log('=== Time Debug Info ===');
@@ -242,7 +242,7 @@ app.get('/api/health', async (req, res) => {
             total_surveys: totalSurveys,
             timestamp: (() => {
                 const time = new Date();
-                time.setHours(time.getHours() - 3); // 减3小时显示
+                time.setHours(time.getHours() + 4); // 加4小时显示
                 return time.toISOString();
             })()
         });

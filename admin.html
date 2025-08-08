@@ -376,9 +376,9 @@
                 console.log('Date UTC string:', date.toUTCString());
                 console.log('Date local string:', date.toString());
                 
-                // 手动转换时间 (减3小时修正)
+                // 手动转换时间 (加4小时修正)
                 const utcTime = date.getTime();
-                const timeOffset = -3 * 60 * 60 * 1000; // 减3小时的毫秒数
+                const timeOffset = 4 * 60 * 60 * 1000; // 加4小时的毫秒数
                 const adjustedTime = new Date(utcTime + timeOffset);
                 
                 // 格式化显示
@@ -393,7 +393,7 @@
                 
                 const formattedDate = `${month} ${day}, ${year}, ${hour}:${minute}`;
                 
-                console.log('Manual time conversion (minus 3 hours):', formattedDate);
+                console.log('Manual time conversion (plus 4 hours):', formattedDate);
                 console.log('==========================');
                 
                 return formattedDate;
