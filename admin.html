@@ -376,9 +376,9 @@
                 console.log('Date UTC string:', date.toUTCString());
                 console.log('Date local string:', date.toString());
                 
-                // 手动转换到纽约时间 (UTC-5)
+                // 手动转换到纽约时间 (加7小时修正)
                 const utcTime = date.getTime();
-                const nyOffset = -5 * 60 * 60 * 1000; // 5小时的毫秒数
+                const nyOffset = 7 * 60 * 60 * 1000; // 加7小时的毫秒数
                 const nyTime = new Date(utcTime + nyOffset);
                 
                 // 格式化显示
