@@ -410,10 +410,7 @@
             const password = prompt('Enter admin password:');
             console.log('Password entered:', password);
             if (password === '123') {
-                alert('Access granted! Redirecting to admin panel...');
-                setTimeout(function() {
-                    window.location.href = 'admin.html';
-                }, 500);
+                window.location.href = 'admin.html';
             } else if (password !== null && password !== '') {
                 alert('Incorrect password!');
             }
