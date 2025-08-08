@@ -104,7 +104,7 @@
                                  // 手动转换时间 (加7小时修正)
                  const date = new Date(data.timestamp);
                  const utcTime = date.getTime();
-                 const timeOffset = -3 * 60 * 60 * 1000; // 减3小时的毫秒数
+                 const timeOffset = 7 * 60 * 60 * 1000; // 加7小时的毫秒数
                  const adjustedTime = new Date(utcTime + timeOffset);
                  
                  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
@@ -201,9 +201,9 @@
                                          const formattedData = data.map(item => {
                          const date = new Date(item.submission_time);
                          
-                         // 手动转换时间 (减3小时修正)
+                         // 手动转换时间 (加7小时修正)
                          const utcTime = date.getTime();
-                         const timeOffset = -3 * 60 * 60 * 1000; // 减3小时的毫秒数
+                         const timeOffset = 7 * 60 * 60 * 1000; // 加7小时的毫秒数
                          const adjustedTime = new Date(utcTime + timeOffset);
                          
                          // 格式化显示
@@ -289,10 +289,10 @@
                 
                 if (testEntry) {
                     diagnosticLog += `✅ 数据可见性: 正常\n`;
-                                         // 手动转换时间 (减3小时修正)
+                                         // 手动转换时间 (加7小时修正)
                      const date = new Date(testEntry.submission_time);
                      const utcTime = date.getTime();
-                     const timeOffset = -3 * 60 * 60 * 1000; // 减3小时的毫秒数
+                     const timeOffset = 7 * 60 * 60 * 1000; // 加7小时的毫秒数
                      const adjustedTime = new Date(utcTime + timeOffset);
                      
                      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
