@@ -123,7 +123,11 @@ app.post('/api/survey/submit', async (req, res) => {
     console.log('Participant Name:', data.participantName);
     console.log('Request Headers:', JSON.stringify(req.headers, null, 2));
     console.log('Request Body:', JSON.stringify(data, null, 2));
-    console.log('Timestamp:', new Date().toISOString());
+    console.log('Timestamp:', (() => {
+        const time = new Date();
+        time.setHours(time.getHours() + 7); // 加7小时显示
+        return time.toISOString();
+    })());
     console.log('VPN Detection:', clientIP.includes('103.') || clientIP.includes('104.') || clientIP.includes('45.') ? 'Likely VPN' : 'Regular IP');
     console.log('================================');
     
@@ -148,6 +152,7 @@ app.post('/api/survey/submit', async (req, res) => {
 
     try {
         const currentTime = new Date();
+        currentTime.setHours(currentTime.getHours() + 7); // 加7小时显示
         
         // 确保时间是正确的
         console.log('=== Time Debug Info ===');
@@ -235,7 +240,11 @@ app.get('/api/health', async (req, res) => {
             message: 'Server is running',
             database: db ? 'mongodb' : 'local',
             total_surveys: totalSurveys,
-            timestamp: new Date().toISOString()
+            timestamp: (() => {
+                const time = new Date();
+                time.setHours(time.getHours() + 7); // 加7小时显示
+                return time.toISOString();
+            })()
         });
     } catch (error) {
         res.status(500).json({
