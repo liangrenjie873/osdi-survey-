@@ -84,7 +84,15 @@
             output += `ISO 格式: ${now.toISOString()}\n`;
             output += `UTC 格式: ${now.toUTCString()}\n`;
             output += `本地时间: ${now.toLocaleString()}\n`;
-            output += `美国东部时间: ${now.toLocaleString('en-US', {timeZone: 'America/New_York'})}\n`;
+            output += `美国东部时间: ${now.toLocaleString('en-US', {
+                year: 'numeric',
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'America/New_York',
+                hour12: false
+            })}\n`;
             output += `美国中部时间: ${now.toLocaleString('en-US', {timeZone: 'America/Chicago'})}\n`;
             output += `美国山地时间: ${now.toLocaleString('en-US', {timeZone: 'America/Denver'})}\n`;
             output += `美国太平洋时间: ${now.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})}\n`;
@@ -110,15 +118,15 @@
                 output += `数据 ${index + 1}:\n`;
                 output += `  原始字符串: ${timeString}\n`;
                 output += `  解析后对象: ${date}\n`;
-                output += `  美国东部时间: ${date.toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'America/New_York',
-                    hour12: true
-                })}\n\n`;
+                                 output += `  美国东部时间: ${date.toLocaleString('en-US', {
+                     year: 'numeric',
+                     month: 'short',
+                     day: 'numeric',
+                     hour: '2-digit',
+                     minute: '2-digit',
+                     timeZone: 'America/New_York',
+                     hour12: false
+                 })}\n\n`;
             });
             
             resultDiv.textContent = output;
@@ -148,7 +156,7 @@
                     hour: '2-digit',
                     minute: '2-digit',
                     timeZone: tz.zone,
-                    hour12: true
+                    hour12: false
                 });
                 
                 output += `${tz.name}: ${formatted}\n`;

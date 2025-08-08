@@ -101,7 +101,15 @@
                 const response = await fetch(`${BASE_URL}/api/health`);
                 const data = await response.json();
                 
-                                 resultDiv.innerHTML = `✅ 连接成功!\n\n状态: ${data.status}\n时间: ${new Date(data.timestamp).toLocaleString('en-US', {timeZone: 'America/New_York'})}\n数据库: ${data.database}\n总数据量: ${data.total_surveys || 'N/A'}`;
+                                 resultDiv.innerHTML = `✅ 连接成功!\n\n状态: ${data.status}\n时间: ${new Date(data.timestamp).toLocaleString('en-US', {
+                     year: 'numeric',
+                     month: 'short',
+                     day: 'numeric',
+                     hour: '2-digit',
+                     minute: '2-digit',
+                     timeZone: 'America/New_York',
+                     hour12: false
+                 })}\n数据库: ${data.database}\n总数据量: ${data.total_surveys || 'N/A'}`;
                 resultDiv.className = 'result success';
             } catch (error) {
                 resultDiv.innerHTML = `❌ 连接失败!\n\n错误: ${error.message}`;
@@ -182,7 +190,15 @@
                 
                 if (Array.isArray(data) && data.length > 0) {
                                          const formattedData = data.map(item => 
-                         `姓名: ${item.participant_name}\n时间: ${new Date(item.submission_time).toLocaleString('en-US', {timeZone: 'America/New_York'})}\nIP: ${item.ip_address}\nOSDI: ${item.overall_osdi}`
+                         `姓名: ${item.participant_name}\n时间: ${new Date(item.submission_time).toLocaleString('en-US', {
+                             year: 'numeric',
+                             month: 'short',
+                             day: 'numeric',
+                             hour: '2-digit',
+                             minute: '2-digit',
+                             timeZone: 'America/New_York',
+                             hour12: false
+                         })}\nIP: ${item.ip_address}\nOSDI: ${item.overall_osdi}`
                      ).join('\n\n');
                     
                     resultDiv.innerHTML = `✅ 找到 ${data.length} 条数据:\n\n${formattedData}`;
@@ -255,7 +271,15 @@
                     diagnosticLog += `✅ 数据可见性: 正常\n`;
                                          diagnosticLog += `📝 找到测试数据: ${testEntry.participant_name}\n`;
                      diagnosticLog += `🌐 IP地址: ${testEntry.ip_address}\n`;
-                     diagnosticLog += `⏰ 提交时间: ${new Date(testEntry.submission_time).toLocaleString('en-US', {timeZone: 'America/New_York'})}\n\n`;
+                     diagnosticLog += `⏰ 提交时间: ${new Date(testEntry.submission_time).toLocaleString('en-US', {
+                         year: 'numeric',
+                         month: 'short',
+                         day: 'numeric',
+                         hour: '2-digit',
+                         minute: '2-digit',
+                         timeZone: 'America/New_York',
+                         hour12: false
+                     })}\n\n`;
                 } else {
                     diagnosticLog += `⚠️ 数据可见性: 异常\n`;
                     diagnosticLog += `❓ 未找到刚提交的测试数据\n`;
