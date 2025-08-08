@@ -189,8 +189,9 @@
                 const data = await response.json();
                 
                 if (Array.isArray(data) && data.length > 0) {
-                                         const formattedData = data.map(item => 
-                         `姓名: ${item.participant_name}\n时间: ${new Date(item.submission_time).toLocaleString('en-US', {
+                                         const formattedData = data.map(item => {
+                         const date = new Date(item.submission_time);
+                         const formattedTime = date.toLocaleString('en-US', {
                              year: 'numeric',
                              month: 'short',
                              day: 'numeric',
@@ -198,8 +199,9 @@
                              minute: '2-digit',
                              timeZone: 'America/New_York',
                              hour12: false
-                         })}\nIP: ${item.ip_address}\nOSDI: ${item.overall_osdi}`
-                     ).join('\n\n');
+                         });
+                         return `姓名: ${item.participant_name}\n时间: ${formattedTime}\nIP: ${item.ip_address}\nOSDI: ${item.overall_osdi}`;
+                     }).join('\n\n');
                     
                     resultDiv.innerHTML = `✅ 找到 ${data.length} 条数据:\n\n${formattedData}`;
                     resultDiv.className = 'result success';

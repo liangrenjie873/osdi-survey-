@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Fix - Manual Timezone Conversion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .fix-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .result {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        button {
+            background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 时间修复工具</h1>
+        <p>使用手动时区转换来确保正确的纽约时间显示</p>
+
+        <div class="fix-section">
+            <h3>手动时区转换函数</h3>
+            <button onclick="testManualConversion()">测试手动转换</button>
+            <div id="manualResult" class="result"></div>
+        </div>
+
+        <div class="fix-section">
+            <h3>服务器数据修复</h3>
+            <button onclick="fixServerData()">修复服务器数据显示</button>
+            <div id="serverResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // 手动时区转换函数 - 确保正确的纽约时间
+        function convertToNewYorkTime(dateString) {
+            try {
+                const date = new Date(dateString);
+                
+                if (isNaN(date.getTime())) {
+                    return 'Invalid Date';
+                }
+                
+                // 获取UTC时间
+                const utcYear = date.getUTCFullYear();
+                const utcMonth = date.getUTCMonth();
+                const utcDay = date.getUTCDate();
+                const utcHour = date.getUTCHours();
+                const utcMinute = date.getUTCMinutes();
+                const utcSecond = date.getUTCSeconds();
+                
+                // 纽约时区偏移 (UTC-5 或 UTC-4，取决于夏令时)
+                // 简化处理：使用UTC-5 (EST)
+                const nyOffset = -5 * 60; // 5小时 = 300分钟
+                
+                // 计算纽约时间
+                const nyDate = new Date(Date.UTC(utcYear, utcMonth, utcDay, utcHour, utcMinute, utcSecond));
+                nyDate.setUTCMinutes(nyDate.getUTCMinutes() + nyOffset);
+                
+                // 格式化显示
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                
+                const month = months[nyDate.getUTCMonth()];
+                const day = nyDate.getUTCDate();
+                const year = nyDate.getUTCFullYear();
+                const hour = nyDate.getUTCHours().toString().padStart(2, '0');
+                const minute = nyDate.getUTCMinutes().toString().padStart(2, '0');
+                
+                return `${month} ${day}, ${year}, ${hour}:${minute}`;
+                
+            } catch (error) {
+                console.error('Error in manual conversion:', error);
+                return 'Conversion Error';
+            }
+        }
+
+        function testManualConversion() {
+            const resultDiv = document.getElementById('manualResult');
+            
+            // 测试时间
+            const testTimes = [
+                '2025-08-08T02:28:00.000Z',
+                '2025-08-08T06:33:00.000Z',
+                new Date().toISOString()
+            ];
+            
+            let output = '=== 手动时区转换测试 ===\n\n';
+            
+            testTimes.forEach((timeString, index) => {
+                output += `测试 ${index + 1}:\n`;
+                output += `  原始时间: ${timeString}\n`;
+                output += `  手动转换: ${convertToNewYorkTime(timeString)}\n`;
+                output += `  浏览器转换: ${new Date(timeString).toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/New_York',
+                    hour12: false
+                })}\n\n`;
+            });
+            
+            resultDiv.textContent = output;
+        }
+
+        async function fixServerData() {
+            const resultDiv = document.getElementById('serverResult');
+            resultDiv.textContent = '正在获取服务器数据...';
+            
+            try {
+                const response = await fetch('/api/survey/recent/5');
+                const data = await response.json();
+                
+                let output = '=== 服务器数据修复 ===\n\n';
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach((item, index) => {
+                        output += `数据 ${index + 1}:\n`;
+                        output += `  原始时间: ${item.submission_time}\n`;
+                        output += `  手动转换: ${convertToNewYorkTime(item.submission_time)}\n`;
+                        output += `  浏览器转换: ${new Date(item.submission_time).toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            timeZone: 'America/New_York',
+                            hour12: false
+                        })}\n\n`;
+                    });
+                } else {
+                    output += '❌ 没有找到服务器数据\n';
+                }
+                
+                resultDiv.textContent = output;
+            } catch (error) {
+                resultDiv.textContent = `❌ 获取服务器数据失败: ${error.message}`;
+            }
+        }
+
+        // 页面加载时自动测试
+        window.onload = function() {
+            testManualConversion();
+        };
+    </script>
+</body>
+</html> 
