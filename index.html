@@ -18,23 +18,24 @@
             
             <!-- 右上角管理员入口 -->
             <div style="position: absolute; top: 15px; right: 15px;">
-                <a href="admin.html" style="
+                <div onclick="showPasswordPrompt()" style="
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
                     width: 28px;
                     height: 28px;
                     background: transparent;
-                    color: #888;
+                    color: white;
                     text-decoration: none;
                     transition: all 0.2s ease;
                     z-index: 1000;
-                " onmouseover="this.style.color='#555';" onmouseout="this.style.color='#888';" title="Admin Panel">
+                    cursor: pointer;
+                " onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';" title="Admin Panel (Password Required)">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                </a>
+                </div>
             </div>
             
             <h1>OSDI TEST</h1>
@@ -403,33 +404,35 @@
 
     <script src="script.js"></script>
     <script type="text/javascript">
+        // 密码验证函数
+        function showPasswordPrompt() {
+            const password = prompt('Enter admin password:');
+            if (password === '123') {
+                alert('Access granted! Redirecting to admin panel...');
+                setTimeout(function() {
+                    window.location.href = 'admin.html';
+                }, 500);
+            } else if (password !== null && password !== '') {
+                alert('Incorrect password!');
+            }
+        }
+        
         // 全局管理员访问函数 - 兼容版本
         function handleAdminClick() {
-            try {
-                var password = prompt('Enter admin password:');
-                if (password === '123456') {
-                    alert('Access granted! Redirecting to admin panel...');
-                    setTimeout(function() {
-                        window.location.href = 'admin.html';
-                    }, 500);
-                } else if (password !== null && password !== '') {
-                    alert('Incorrect password!');
-                }
-            } catch (e) {
-                alert('Error: ' + e.message);
-            }
+            showPasswordPrompt();
         }
         
         // 确保函数在全局作用域中
         window.handleAdminClick = handleAdminClick;
+        window.showPasswordPrompt = showPasswordPrompt;
         
         // 备用函数
         function adminAccess() {
-            handleAdminClick();
+            showPasswordPrompt();
         }
         
         function openAdminPanel() {
-            handleAdminClick();
+            showPasswordPrompt();
         }
         
         // 页面加载完成后的初始化
