@@ -156,6 +156,8 @@ app.post('/api/survey/submit', async (req, res) => {
         console.log('Current server time (local):', currentTime.toString());
         console.log('Current server time (UTC):', currentTime.toUTCString());
         console.log('Current server time (US Eastern):', currentTime.toLocaleString('en-US', {timeZone: 'America/New_York'}));
+        console.log('Server timezone offset:', currentTime.getTimezoneOffset());
+        console.log('Server timezone:', Intl.DateTimeFormat().resolvedOptions().timeZone);
         console.log('========================');
         
         const surveyRecord = {

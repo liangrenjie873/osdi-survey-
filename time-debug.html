@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Debug - Detailed Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .debug-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .debug-output {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 12px;
+        }
+        button {
+            background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .test-input {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            color: white;
+            margin: 5px;
+            width: 200px;
+        }
+        .test-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 详细时间调试工具</h1>
+        <p>这个工具用于深入分析时间显示问题</p>
+
+        <div class="debug-section">
+            <h3>1. 系统时间信息</h3>
+            <button onclick="showSystemTime()">显示系统时间信息</button>
+            <div id="systemTime" class="debug-output"></div>
+        </div>
+
+        <div class="debug-section">
+            <h3>2. 时区转换测试</h3>
+            <input type="text" id="testTime" class="test-input" placeholder="输入时间字符串 (如: 2025-08-08T02:28:00.000Z)">
+            <button onclick="testTimezoneConversion()">测试时区转换</button>
+            <div id="timezoneTest" class="debug-output"></div>
+        </div>
+
+        <div class="debug-section">
+            <h3>3. 服务器数据时间测试</h3>
+            <button onclick="testServerData()">测试服务器数据时间</button>
+            <div id="serverDataTest" class="debug-output"></div>
+        </div>
+
+        <div class="debug-section">
+            <h3>4. 手动时间测试</h3>
+            <input type="datetime-local" id="manualTime" class="test-input">
+            <button onclick="testManualTime()">测试手动时间</button>
+            <div id="manualTimeTest" class="debug-output"></div>
+        </div>
+    </div>
+
+    <script>
+        function showSystemTime() {
+            const now = new Date();
+            const resultDiv = document.getElementById('systemTime');
+            
+            let output = '=== 系统时间信息 ===\n\n';
+            output += `当前时间对象: ${now}\n`;
+            output += `时间戳: ${now.getTime()}\n`;
+            output += `ISO 字符串: ${now.toISOString()}\n`;
+            output += `UTC 字符串: ${now.toUTCString()}\n`;
+            output += `本地字符串: ${now.toString()}\n`;
+            output += `时区偏移: ${now.getTimezoneOffset()} 分钟\n`;
+            output += `系统时区: ${Intl.DateTimeFormat().resolvedOptions().timeZone}\n\n`;
+            
+            // 测试不同时区
+            const timezones = [
+                'UTC', 'America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles',
+                'Asia/Shanghai', 'Asia/Tokyo', 'Europe/London', 'Europe/Paris'
+            ];
+            
+            output += '=== 不同时区显示 ===\n';
+            timezones.forEach(tz => {
+                try {
+                    const formatted = now.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: tz,
+                        hour12: false
+                    });
+                    output += `${tz}: ${formatted}\n`;
+                } catch (error) {
+                    output += `${tz}: Error - ${error.message}\n`;
+                }
+            });
+            
+            resultDiv.textContent = output;
+        }
+
+        function testTimezoneConversion() {
+            const timeString = document.getElementById('testTime').value || '2025-08-08T02:28:00.000Z';
+            const resultDiv = document.getElementById('timezoneTest');
+            
+            let output = `=== 时区转换测试 ===\n\n`;
+            output += `输入时间: ${timeString}\n\n`;
+            
+            try {
+                const date = new Date(timeString);
+                
+                if (isNaN(date.getTime())) {
+                    output += '❌ 无效的时间格式\n';
+                } else {
+                    output += `解析后时间对象: ${date}\n`;
+                    output += `时间戳: ${date.getTime()}\n`;
+                    output += `ISO 字符串: ${date.toISOString()}\n`;
+                    output += `UTC 字符串: ${date.toUTCString()}\n`;
+                    output += `本地字符串: ${date.toString()}\n\n`;
+                    
+                    // 测试纽约时区
+                    const nyTime = date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: 'America/New_York',
+                        hour12: false
+                    });
+                    
+                    output += `纽约时间 (24小时制): ${nyTime}\n`;
+                    
+                    const nyTime12 = date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: 'America/New_York',
+                        hour12: true
+                    });
+                    
+                    output += `纽约时间 (12小时制): ${nyTime12}\n`;
+                }
+            } catch (error) {
+                output += `❌ 转换错误: ${error.message}\n`;
+            }
+            
+            resultDiv.textContent = output;
+        }
+
+        async function testServerData() {
+            const resultDiv = document.getElementById('serverDataTest');
+            resultDiv.textContent = '正在获取服务器数据...';
+            
+            try {
+                const response = await fetch('/api/survey/recent/5');
+                const data = await response.json();
+                
+                let output = '=== 服务器数据时间测试 ===\n\n';
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach((item, index) => {
+                        output += `数据 ${index + 1}:\n`;
+                        output += `  原始时间: ${item.submission_time}\n`;
+                        
+                        const date = new Date(item.submission_time);
+                        output += `  解析后对象: ${date}\n`;
+                        output += `  ISO 字符串: ${date.toISOString()}\n`;
+                        
+                        const nyTime = date.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            timeZone: 'America/New_York',
+                            hour12: false
+                        });
+                        
+                        output += `  纽约时间: ${nyTime}\n\n`;
+                    });
+                } else {
+                    output += '❌ 没有找到服务器数据\n';
+                }
+                
+                resultDiv.textContent = output;
+            } catch (error) {
+                resultDiv.textContent = `❌ 获取服务器数据失败: ${error.message}`;
+            }
+        }
+
+        function testManualTime() {
+            const manualTime = document.getElementById('manualTime').value;
+            const resultDiv = document.getElementById('manualTimeTest');
+            
+            if (!manualTime) {
+                resultDiv.textContent = '请先选择时间';
+                return;
+            }
+            
+            let output = `=== 手动时间测试 ===\n\n`;
+            output += `选择的时间: ${manualTime}\n\n`;
+            
+            try {
+                const date = new Date(manualTime);
+                
+                output += `解析后对象: ${date}\n`;
+                output += `ISO 字符串: ${date.toISOString()}\n`;
+                output += `UTC 字符串: ${date.toUTCString()}\n`;
+                output += `本地字符串: ${date.toString()}\n\n`;
+                
+                const nyTime = date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/New_York',
+                    hour12: false
+                });
+                
+                output += `纽约时间: ${nyTime}\n`;
+                
+            } catch (error) {
+                output += `❌ 转换错误: ${error.message}\n`;
+            }
+            
+            resultDiv.textContent = output;
+        }
+
+        // 页面加载时自动显示系统时间
+        window.onload = function() {
+            showSystemTime();
+        };
+    </script>
+</body>
+</html> 
