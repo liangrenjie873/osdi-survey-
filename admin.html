@@ -358,7 +358,7 @@
             console.log('Table HTML generated:', html);
         }
 
-        // Format date for display - US timezone
+        // Format date for display - New York timezone with manual conversion
         function formatDate(dateString) {
             try {
                 const date = new Date(dateString);
@@ -376,20 +376,24 @@
                 console.log('Date UTC string:', date.toUTCString());
                 console.log('Date local string:', date.toString());
                 
-                // 使用更可靠的时间格式化方法
-                const options = {
-                    year: 'numeric',
-                    month: 'short',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'America/New_York',
-                    hour12: false
-                };
+                // 手动转换到纽约时间 (UTC-5)
+                const utcTime = date.getTime();
+                const nyOffset = -5 * 60 * 60 * 1000; // 5小时的毫秒数
+                const nyTime = new Date(utcTime + nyOffset);
                 
-                const formattedDate = date.toLocaleString('en-US', options);
+                // 格式化显示
+                const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
                 
-                console.log('Formatted date (US Eastern):', formattedDate);
+                const month = months[nyTime.getUTCMonth()];
+                const day = nyTime.getUTCDate();
+                const year = nyTime.getUTCFullYear();
+                const hour = nyTime.getUTCHours().toString().padStart(2, '0');
+                const minute = nyTime.getUTCMinutes().toString().padStart(2, '0');
+                
+                const formattedDate = `${month} ${day}, ${year}, ${hour}:${minute}`;
+                
+                console.log('Manual NY time conversion:', formattedDate);
                 console.log('==========================');
                 
                 return formattedDate;
