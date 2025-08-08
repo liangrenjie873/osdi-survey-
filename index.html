@@ -18,14 +18,14 @@
             
             <!-- 右上角管理员入口 -->
             <div style="position: absolute; top: 15px; right: 15px;">
-                <div id="adminIcon" style="
+                <a href="javascript:void(0)" id="adminIcon" onclick="showPasswordPrompt(); return false;" style="
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
                     width: 28px;
                     height: 28px;
                     background: transparent;
-                    color: white;
+                    color: #888;
                     text-decoration: none;
                     transition: all 0.2s ease;
                     z-index: 1000;
@@ -35,7 +35,7 @@
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                </div>
+                </a>
             </div>
             
             <h1>OSDI TEST</h1>
@@ -447,18 +447,19 @@
                 console.log('Admin icon found, adding event listeners...');
                 
                 // 添加点击事件监听器
-                adminIcon.addEventListener('click', function() {
+                adminIcon.addEventListener('click', function(e) {
+                    e.preventDefault();
                     console.log('Admin icon clicked');
                     showPasswordPrompt();
                 });
                 
                 // 添加悬停效果
                 adminIcon.addEventListener('mouseover', function() {
-                    this.style.opacity = '0.8';
+                    this.style.color = '#555';
                 });
                 
                 adminIcon.addEventListener('mouseout', function() {
-                    this.style.opacity = '1';
+                    this.style.color = '#888';
                 });
                 
                 console.log('Admin icon event listeners added successfully');
@@ -466,6 +467,12 @@
                 console.error('Admin icon not found!');
             }
         });
+        
+        // 备用方法：直接绑定到window对象
+        window.adminIconClick = function() {
+            console.log('Admin icon clicked via window function');
+            showPasswordPrompt();
+        };
     </script>
 </body>
 </html>
