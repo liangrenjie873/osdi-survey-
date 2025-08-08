@@ -358,7 +358,7 @@
             console.log('Table HTML generated:', html);
         }
 
-        // Format date for display
+        // Format date for display - US timezone
         function formatDate(dateString) {
             const date = new Date(dateString);
             return date.toLocaleDateString('en-US', {
@@ -366,7 +366,8 @@
                 month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                timeZone: 'America/New_York'
             });
         }
 
