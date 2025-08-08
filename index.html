@@ -18,7 +18,7 @@
             
             <!-- 右上角管理员入口 -->
             <div style="position: absolute; top: 15px; right: 15px;">
-                <div onclick="showPasswordPrompt()" style="
+                <div id="adminIcon" style="
                     display: inline-flex;
                     align-items: center;
                     justify-content: center;
@@ -30,7 +30,7 @@
                     transition: all 0.2s ease;
                     z-index: 1000;
                     cursor: pointer;
-                " onmouseover="this.style.opacity='0.8';" onmouseout="this.style.opacity='1';" title="Admin Panel (Password Required)">
+                " title="Admin Panel (Password Required)">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                         <circle cx="12" cy="7" r="4"></circle>
@@ -406,7 +406,9 @@
     <script type="text/javascript">
         // 密码验证函数
         function showPasswordPrompt() {
+            console.log('Password prompt function called');
             const password = prompt('Enter admin password:');
+            console.log('Password entered:', password);
             if (password === '123') {
                 alert('Access granted! Redirecting to admin panel...');
                 setTimeout(function() {
@@ -436,13 +438,34 @@
         }
         
         // 页面加载完成后的初始化
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', function() {
-                console.log('Page loaded, admin functions ready');
-            });
-        } else {
-            console.log('Page already loaded, admin functions ready');
-        }
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, setting up admin icon...');
+            
+            // 获取管理员图标元素
+            const adminIcon = document.getElementById('adminIcon');
+            if (adminIcon) {
+                console.log('Admin icon found, adding event listeners...');
+                
+                // 添加点击事件监听器
+                adminIcon.addEventListener('click', function() {
+                    console.log('Admin icon clicked');
+                    showPasswordPrompt();
+                });
+                
+                // 添加悬停效果
+                adminIcon.addEventListener('mouseover', function() {
+                    this.style.opacity = '0.8';
+                });
+                
+                adminIcon.addEventListener('mouseout', function() {
+                    this.style.opacity = '1';
+                });
+                
+                console.log('Admin icon event listeners added successfully');
+            } else {
+                console.error('Admin icon not found!');
+            }
+        });
     </script>
 </body>
 </html>
