@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Test - US Timezone</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .time-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        .time-display {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        button {
+            background: linear-gradient(135deg, #D01F3E 0%, #e63a5b 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕐 美国时间测试工具</h1>
+        <p>这个工具用于测试和验证美国时区的时间显示</p>
+
+        <div class="time-section">
+            <h3>当前时间显示</h3>
+            <button onclick="showCurrentTimes()">显示当前时间</button>
+            <div id="currentTimes" class="time-display"></div>
+        </div>
+
+        <div class="time-section">
+            <h3>测试数据时间</h3>
+            <button onclick="testDataTimes()">测试数据时间</button>
+            <div id="dataTimes" class="time-display"></div>
+        </div>
+
+        <div class="time-section">
+            <h3>时区对比</h3>
+            <button onclick="compareTimezones()">对比不同时区</button>
+            <div id="timezoneCompare" class="time-display"></div>
+        </div>
+    </div>
+
+    <script>
+        function showCurrentTimes() {
+            const now = new Date();
+            const resultDiv = document.getElementById('currentTimes');
+            
+            let output = '=== 当前时间 ===\n\n';
+            output += `原始时间对象: ${now}\n`;
+            output += `ISO 格式: ${now.toISOString()}\n`;
+            output += `UTC 格式: ${now.toUTCString()}\n`;
+            output += `本地时间: ${now.toLocaleString()}\n`;
+            output += `美国东部时间: ${now.toLocaleString('en-US', {timeZone: 'America/New_York'})}\n`;
+            output += `美国中部时间: ${now.toLocaleString('en-US', {timeZone: 'America/Chicago'})}\n`;
+            output += `美国山地时间: ${now.toLocaleString('en-US', {timeZone: 'America/Denver'})}\n`;
+            output += `美国太平洋时间: ${now.toLocaleString('en-US', {timeZone: 'America/Los_Angeles'})}\n`;
+            
+            resultDiv.textContent = output;
+        }
+
+        function testDataTimes() {
+            const resultDiv = document.getElementById('dataTimes');
+            
+            // 模拟从服务器获取的数据时间
+            const testTimes = [
+                new Date().toISOString(),
+                '2024-12-15T10:30:00.000Z',
+                '2024-12-15T15:45:00.000Z',
+                '2024-12-15T20:15:00.000Z'
+            ];
+            
+            let output = '=== 测试数据时间 ===\n\n';
+            
+            testTimes.forEach((timeString, index) => {
+                const date = new Date(timeString);
+                output += `数据 ${index + 1}:\n`;
+                output += `  原始字符串: ${timeString}\n`;
+                output += `  解析后对象: ${date}\n`;
+                output += `  美国东部时间: ${date.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/New_York',
+                    hour12: true
+                })}\n\n`;
+            });
+            
+            resultDiv.textContent = output;
+        }
+
+        function compareTimezones() {
+            const now = new Date();
+            const resultDiv = document.getElementById('timezoneCompare');
+            
+            const timezones = [
+                { name: 'UTC', zone: 'UTC' },
+                { name: '美国东部时间', zone: 'America/New_York' },
+                { name: '美国中部时间', zone: 'America/Chicago' },
+                { name: '美国山地时间', zone: 'America/Denver' },
+                { name: '美国太平洋时间', zone: 'America/Los_Angeles' },
+                { name: '北京时间', zone: 'Asia/Shanghai' },
+                { name: '东京时间', zone: 'Asia/Tokyo' }
+            ];
+            
+            let output = '=== 时区对比 ===\n\n';
+            
+            timezones.forEach(tz => {
+                const formatted = now.toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: tz.zone,
+                    hour12: true
+                });
+                
+                output += `${tz.name}: ${formatted}\n`;
+            });
+            
+            resultDiv.textContent = output;
+        }
+
+        // 页面加载时自动显示当前时间
+        window.onload = function() {
+            showCurrentTimes();
+        };
+    </script>
+</body>
+</html> 

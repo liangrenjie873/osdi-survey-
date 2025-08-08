@@ -148,11 +148,14 @@ app.post('/api/survey/submit', async (req, res) => {
 
     try {
         const currentTime = new Date();
+        
+        // 确保时间是正确的
         console.log('=== Time Debug Info ===');
         console.log('Current server time:', currentTime);
         console.log('Current server time (ISO):', currentTime.toISOString());
         console.log('Current server time (local):', currentTime.toString());
         console.log('Current server time (UTC):', currentTime.toUTCString());
+        console.log('Current server time (US Eastern):', currentTime.toLocaleString('en-US', {timeZone: 'America/New_York'}));
         console.log('========================');
         
         const surveyRecord = {

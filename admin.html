@@ -360,27 +360,43 @@
 
         // Format date for display - US timezone
         function formatDate(dateString) {
-            const date = new Date(dateString);
-            console.log('=== Date Format Debug ===');
-            console.log('Original dateString:', dateString);
-            console.log('Parsed date object:', date);
-            console.log('Date ISO string:', date.toISOString());
-            console.log('Date UTC string:', date.toUTCString());
-            console.log('Date local string:', date.toString());
-            
-            const formattedDate = date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                timeZone: 'America/New_York'
-            });
-            
-            console.log('Formatted date (US Eastern):', formattedDate);
-            console.log('==========================');
-            
-            return formattedDate;
+            try {
+                const date = new Date(dateString);
+                
+                // 检查日期是否有效
+                if (isNaN(date.getTime())) {
+                    console.error('Invalid date:', dateString);
+                    return 'Invalid Date';
+                }
+                
+                console.log('=== Date Format Debug ===');
+                console.log('Original dateString:', dateString);
+                console.log('Parsed date object:', date);
+                console.log('Date ISO string:', date.toISOString());
+                console.log('Date UTC string:', date.toUTCString());
+                console.log('Date local string:', date.toString());
+                
+                // 使用更可靠的时间格式化方法
+                const options = {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    timeZone: 'America/New_York',
+                    hour12: true
+                };
+                
+                const formattedDate = date.toLocaleDateString('en-US', options);
+                
+                console.log('Formatted date (US Eastern):', formattedDate);
+                console.log('==========================');
+                
+                return formattedDate;
+            } catch (error) {
+                console.error('Error formatting date:', error);
+                return 'Date Error';
+            }
         }
 
         // Get CSS class for score color
